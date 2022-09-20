@@ -1,0 +1,10 @@
+
+- getGapCols in poly time. 
+- compress hashes.
+- paxos doDense *only* iterates over used columns, as opposed to all of them.
+- baxos par solve, remove vector -> std::vector<block> hashes_(mNumItems);
+- optimize/minimize threadBinSize
+
+- on decode, allow unordered output?
+
+- Research question: fewer AES rounds if we only want the first bit to be random? maybe the XOR of the bits?

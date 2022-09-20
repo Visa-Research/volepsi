@@ -1,0 +1,6 @@
+.vs/
+.vscode/
+out/
+thirdparty/
+tests/cmakeTests/
+CMakeSettings.json

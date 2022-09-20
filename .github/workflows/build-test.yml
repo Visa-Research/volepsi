@@ -1,0 +1,197 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ main ]
+  pull_request: {}
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build-ubuntu:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+            submodules: recursive
+
+      # Runs a set of commands using the runners shell
+      - name: build 
+        run: |
+          python3 build.py -DVERBOSE_FETCH=ON
+                        
+      - name: unit test
+        run: |
+          ./out/build/linux/frontend/frontend -u
+          
+      - name: find source tree
+        run: |
+            cd tests/cmakeTests
+            cmake -S . -B out/  -DCMAKE_BUILD_TYPE=Release -D CMAKE_PREFIX_PATH=../../
+            cmake --build out/
+            ./out/main
+            rm -rf out/
+            cd ../..
+            
+      - name: hint test
+        run: |
+            cd tests/cmakeTests
+            cmake -S . -B out/  -D VOLEPSI_HINT=../..
+            cmake --build out/
+            ./out/main
+            rm -rf out/
+            cd ../..
+
+      - name: install prefix test
+        run: |
+            python3 build.py --setup --install=~/install
+            python3 build.py --install=~/install
+            cd tests/cmakeTests
+            cmake -S . -B out/  -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/install
+            cmake --build out/
+            ./out/main
+            rm -rf out/
+            cd ../..
+
+      - name: install test
+        run: |
+            python3 build.py --setup --install --sudo
+            python3 build.py --install --sudo
+            cd tests/cmakeTests
+            cmake -S . -B out/  -DCMAKE_BUILD_TYPE=Release
+            cmake --build out/
+            ./out/main
+            rm -rf out/
+            cd ../..
+            
+  # This workflow contains a single job called "build"
+  build-osx:
+    # The type of runner that the job will run on
+    runs-on: macos-latest
+    timeout-minutes: 20
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+            submodules: recursive
+      # Runs a set of commands using the runners shell
+      - name: automake
+        run: brew install autoconf automake libtool
+
+      - name: build 
+        run: |
+          python3 build.py -DVERBOSE_FETCH=ON -DVOLE_PSI_ENABLE_SSE=OFF
+                        
+      - name: unit test
+        run: |
+          ./out/build/osx/frontend/frontend -u
+          
+      - name: find source tree
+        run: |
+            cd tests/cmakeTests
+            cmake -S . -B out/  -DCMAKE_BUILD_TYPE=Release -D CMAKE_PREFIX_PATH=../../
+            cmake --build out/
+            ./out/main
+            rm -rf out/
+            cd ../..
+            
+      - name: hint test
+        run: |
+            cd tests/cmakeTests
+            cmake -S . -B out/  -D VOLEPSI_HINT=../..
+            cmake --build out/
+            ./out/main
+            rm -rf out/
+            cd ../..
+
+      - name: install prefix test
+        run: |
+            python3 build.py --setup --install=~/install
+            python3 build.py --install=~/install
+            cd tests/cmakeTests
+            cmake -S . -B out/  -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/install
+            cmake --build out/
+            ./out/main
+            rm -rf out/
+            cd ../..
+
+      - name: install test
+        run: |
+            python3 build.py --setup --install --sudo
+            python3 build.py --install --sudo
+            cd tests/cmakeTests
+            cmake -S . -B out/  -DCMAKE_BUILD_TYPE=Release
+            cmake --build out/
+            ./out/main
+            rm -rf out/
+            cd ../..
+
+
+  build-windows:
+    # The type of runner that the job will run on
+    runs-on: windows-2019
+    timeout-minutes: 20
+  
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+            submodules: recursive
+      - uses: seanmiddleditch/gha-setup-ninja@v3
+      - uses: ilammy/msvc-dev-cmd@v1
+
+
+      # Runs a set of commands using the runners shell
+      - name: build 
+        run: |
+          python3 build.py -DVERBOSE_FETCH=ON
+                        
+      - name: unit test
+        run: |
+          ./out/build/x64-Release/frontend/Release/frontend.exe -u
+          
+      - name: find source tree
+        run: |
+            cd tests/cmakeTests
+            cmake -S . -B out/  -DCMAKE_BUILD_TYPE=Release -D CMAKE_PREFIX_PATH=../../
+            cmake --build out/ --config Release
+            ./out/Release/main.exe
+            rm -r -fo out/
+            cd ../..
+            
+      - name: hint test
+        run: |
+            python3 build.py --setup 
+            python3 build.py
+            cd tests/cmakeTests
+            cmake -S . -B out/  -D VOLEPSI_HINT=../..
+            cmake --build out/ --config Release
+            ./out/Release/main.exe
+            rm -r -fo out/
+            cd ../..
+
+      - name: install prefix test
+        run: |
+            python3 build.py --setup --install=~/install 
+            python3 build.py --install=~/install 
+            cd tests/cmakeTests
+            cmake -S . -B out/  -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=~/install
+            cmake --build out/ --config Release
+            ./out/Release/main.exe
+            rm -r -fo out/
+            cd ../..

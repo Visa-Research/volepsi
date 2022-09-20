@@ -1,0 +1,13 @@
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/volePSITargets.cmake")
+
+include("${CMAKE_CURRENT_LIST_DIR}/findDependancies.cmake")
+
+
+get_target_property(volePSI_INCLUDE_DIRS visa::volePSI INTERFACE_INCLUDE_DIRECTORIES)
+
+get_target_property(volePSI_LIBRARIES visa::volePSI LOCATION)
+
+message("volePSI_INCLUDE_DIRS=${volePSI_INCLUDE_DIRS}")
+message("volePSI_LIBRARIES=${volePSI_LIBRARIES}")
