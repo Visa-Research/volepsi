@@ -657,14 +657,12 @@ namespace volePSI
 		else
 		{
 			auto hh = hash;
-			u64 byteIdx = 0;
 			for (u64 j = 0; j < mWeight; ++j)
 			{
 				auto modulus = (mSparseSize - j);
 
 				hh = hh.gf128Mul(hh);
 				//std::memcpy(&h, (u8*)&hash + byteIdx, mIdxSize);
-				byteIdx += mIdxSize;
 				auto colIdx = hh.get<u64>(0) % modulus;
 
 				auto iter = row;
