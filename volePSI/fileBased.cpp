@@ -123,7 +123,7 @@ namespace volePSI
 	template<typename InputIterator >
 	void counting_sort(InputIterator first, InputIterator last, u64 endIndex)
 	{
-		using ValueType = std::iterator_traits<InputIterator>::value_type;
+		using ValueType = typename std::iterator_traits<InputIterator>::value_type;
 		std::vector<u64> counts(endIndex);
 
 		for (auto value = first; value < last; ++value) {

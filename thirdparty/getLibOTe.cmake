@@ -2,7 +2,7 @@
 set(USER_NAME           )      
 set(TOKEN               )      
 set(GIT_REPOSITORY      "https://github.com/osu-crypto/libOTe.git")
-set(GIT_TAG             "e08274681a45adfd971995b0687e6d1a959b1cea" )
+set(GIT_TAG             "e8df240c4f65cca0c0dd10984c6b8ab10c00bc28" )
 
 set(DEP_NAME            libOTe)          
 set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
@@ -31,7 +31,7 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
                        -DVERBOSE_FETCH=${VERBOSE_FETCH}
                        -DENABLE_CIRCUITS=ON
                        -DENABLE_MRR=ON
-                       -DENABLE_KOS=OFF
+                       -DENABLE_IKNP=ON
                        -DENABLE_SOFTSPOKEN_OT=ON
                        -DENABLE_BITPOLYMUL=ON
                        -DENABLE_SILENTOT=ON
