@@ -43,7 +43,13 @@ option(VOLE_PSI_ENABLE_CPSI   "compile the library with circuit PSI" ON)
 option(VOLE_PSI_ENABLE_OPPRF  "compile the library with OPPRF" ON)
 option(COPROTO_ENABLE_BOOST   "build coproto with boost support" OFF)
 option(COPROTO_ENABLE_OPENSSL   "build coproto with boost openssl support" OFF)
-option(LIBOTE_ENABLE_BITPOLYMUL   "build libOTe with quasiCyclic support" OFF)
+
+if(APPLE)
+    option(LIBOTE_ENABLE_BITPOLYMUL   "build libOTe with quasiCyclic support" OFF)
+else()
+    option(LIBOTE_ENABLE_BITPOLYMUL   "build libOTe with quasiCyclic support" ON)
+endif()
+
 
 if(VOLE_PSI_ENABLE_CPSI)
     set(VOLE_PSI_ENABLE_GMW ${VOLE_PSI_ENABLE_CPSI})
@@ -51,6 +57,8 @@ endif()
 if(VOLE_PSI_ENABLE_CPSI)
     set(VOLE_PSI_ENABLE_OPPRF ${VOLE_PSI_ENABLE_CPSI})
 endif()
+
+
 
 message("\n")
 message(STATUS "Option: VOLE_PSI_ENABLE_SSE      = ${VOLE_PSI_ENABLE_SSE}")
