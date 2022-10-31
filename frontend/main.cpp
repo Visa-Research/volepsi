@@ -76,6 +76,41 @@ int main(int argc, char** argv)
             ;
 
 
+        std::cout << oc::Color::Green << "Benchmark programs: \n" << oc::Color::Default
+            << "   -perf: required flag to run benchmarking\n"
+            << "   -psi: Run the PSI benchmark.\n"
+            << "      -nn <value>: the log2 size of the sets.\n"
+            << "      -t <value>: the number of trials.\n"
+            << "      -malicious: run with malicious security.\n"
+            << "      -v: verbose.\n"
+            << "      -nt: number of threads.\n"
+            << "      -fakeBase: use fake base OTs.\n"
+            << "      -nc: do not compress the OPRF outputs.\n"
+            << "      -useSilver: Use the silver Vole encoding.\n"
+            << "      -bs: the okvs bin size.\n"
+            << "   -cpsi: Run the circuit psi benchmark.\n"
+            << "      -nn <value>: the log2 size of the sets.\n"
+            << "      -t <value>: the number of trials.\n"
+            << "      -v: verbose.\n"
+            << "      -nt: number of threads.\n"
+            << "   -paxos: Run the okvs benchmark.\n"
+            << "      -n <value>: The set size. Can also set n using -nn wher n=2^nn.\n"
+            << "      -t <value>: the number of trials.\n"
+            << "      -b <value>: The bitcount of the index type. Must by a multiple of 8 and greater than 1.3*n.\n"
+            << "      -v: verbose.\n"
+            << "      -w <value>: The okvs weight.\n"
+            << "      -ssp <value>: statistical security parameter.\n"
+            << "      -binary: binary okvs dense columns.\n"
+            << "      -cols: The size of the okvs elemenst in multiples of 16 bytes. default = 1.\n"
+            << "   -baxos: The the bin okvs benchmark. Same parameters as -paxos plus.\n"
+            << "      -lbs <value>: the log2 bin size.\n"
+            << "      -nt: number of threads.\n"
+
+            ;
+
+
+
+
 
         std::cout << oc::Color::Green << "Unit tests: \n" << oc::Color::Default
             << "   -u: Run all of the unit tests.\n"

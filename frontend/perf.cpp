@@ -346,12 +346,12 @@ void perfPSI(oc::CLP& cmd)
 {
 	auto n = 1ull << cmd.getOr("nn", 10);
 	auto t = cmd.getOr("t", 1ull);
-	auto mal = cmd.isSet("mal");
+	auto mal = cmd.isSet("malicious");
 	auto v = cmd.isSet("v") ? cmd.getOr("v", 1) : 0;
 	auto nt = cmd.getOr("nt", 1);
 	bool fakeBase = cmd.isSet("fakeBase");
 	bool noCompress = cmd.isSet("nc");
-	auto mult = cmd.getOr<std::string>("mult", "silver");
+	bool useSilver = cmd.isSet("useSilver");
 	//IOService ios;
 
 	//auto chl0 = Session(ios, "localhost:1212", SessionMode::Server).addChannel();
@@ -379,7 +379,7 @@ void perfPSI(oc::CLP& cmd)
 	send.init(n, n, 40, ZeroBlock, mal, nt);
 
 #ifdef ENABLE_BITPOLYMUL
-	if (mult == "silver")
+	if (useSilver)
 	{
 		recv.setMultType(oc::MultType::slv5);
 		send.setMultType(oc::MultType::slv5);
