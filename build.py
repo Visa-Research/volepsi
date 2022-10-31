@@ -142,6 +142,11 @@ def parseInstallArgs(args):
 
     return (args, doInstall)
 
+def rm(path):
+    if os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)
+
+
 def main(projectName, argv):
 
     if "--help" in argv:
@@ -150,16 +155,17 @@ def main(projectName, argv):
 
 
     if "--clean" in argv:
-        shutil.rmtree("out/")
-        shutil.rmtree("thirdparty/libOTe")
-        shutil.rmtree("thirdparty/libdivide")
-        shutil.rmtree("thirdparty/sparsehash-c11")
+        rm("out/")
+        rm("thirdparty/libOTe")
+        rm("thirdparty/libdivide")
+        rm("thirdparty/sparsehash-c11")
+        argv = replace(argv, "--clean", "")
 
     if any("LIBOTE" in arg for arg in argv):
-        shutil.rmtree("out/install")
+        rm("out/install")
     if any("COPROTO" in arg for arg in argv):
-        shutil.rmtree("out/install")
-        shutil.rmtree("thirdparty/libOTe/out/install")
+        rm("out/install")
+        rm("thirdparty/libOTe/out/install")
 
     sudo = "--sudo" in argv;
     if not sudo:

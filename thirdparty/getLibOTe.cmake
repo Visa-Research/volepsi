@@ -2,7 +2,7 @@
 set(USER_NAME           )      
 set(TOKEN               )      
 set(GIT_REPOSITORY      "https://github.com/osu-crypto/libOTe.git")
-set(GIT_TAG             "e8df240c4f65cca0c0dd10984c6b8ab10c00bc28" )
+set(GIT_TAG             "a0ad74c9101f383b9cc14bbbd15e88654d8c1558" )
 
 set(DEP_NAME            libOTe)          
 set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
