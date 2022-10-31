@@ -227,25 +227,6 @@ namespace volePSI
 		}
 	}
 
-	void padSmallSet(std::vector<block>& set, u64& theirSize, const oc::CLP& cmd)
-	{
-		if (set.size() != theirSize)
-		{
-			if (cmd.isSet("padSmallSet") == false)
-				throw std::runtime_error("This protocol currently requires equal set sizes. Use the -padSmallSet flag to add padding to the smaller set. Note that a malicious party can now have a larger set. If this is an problem feel free to open a github issue. ");
-
-			if (set.size() < theirSize)
-			{
-				set.reserve(theirSize);
-				PRNG prng(oc::sysRandomSeed());
-				while (set.size() != theirSize)
-					set.push_back(prng.get<block>());
-			}
-			else
-				theirSize = set.size();
-		}
-	}
-
 	void doFilePSI(const oc::CLP& cmd)
 	{
 		try {
@@ -257,6 +238,13 @@ namespace volePSI
 			bool sortOutput = !cmd.isSet("noSort");
 			bool tls = cmd.isSet("tls");
 			bool quiet = cmd.isSet("quiet");
+
+    // The vole type.
+#ifdef ENABLE_BITPOLYMUL
+   		 	auto mType = cmd.isSet("useSilver") ? oc::MultType::slv5 : oc::MultType::QuasiCyclic;
+#else
+    		auto mType = oc::MultType::slv5;
+#endif
 
 			FileType ft = FileType::Unspecified;
 			if (cmd.isSet("bin")) ft = FileType::Bin;
@@ -371,6 +359,7 @@ namespace volePSI
 			{
 				RsPsiSender sender;
 
+				sender.setMultType(mType);
 				sender.init(set.size(), theirSize, statSetParam, oc::sysRandomSeed(), mal, 1);
 				macoro::sync_wait(sender.run(set, chl));
 				macoro::sync_wait(chl.flush());
@@ -384,6 +373,7 @@ namespace volePSI
 			{
 				RsPsiReceiver recver;
 
+				recver.setMultType(mType);
 				recver.init(theirSize, set.size(), statSetParam, oc::sysRandomSeed(), mal, 1);
 				macoro::sync_wait(recver.run(set, chl));
 				macoro::sync_wait(chl.flush());

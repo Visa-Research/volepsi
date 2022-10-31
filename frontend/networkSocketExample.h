@@ -7,14 +7,26 @@
 void networkSocketExampleRun(const oc::CLP& cmd)
 {
     try {
-        bool client = cmd.isSet("client");
+        auto recver = cmd.get<int>("r");
+        bool client = !cmd.getOr("server", recver);
         auto ip = cmd.getOr<std::string>("ip", "localhost:1212");
 
-        auto ns = cmd.getOr("ns", 100);
-        auto nr = cmd.getOr("nr", 100);
+        auto ns = cmd.getOr("senderSize", 100);
+        auto nr = cmd.getOr("receiverSize", 100);
         auto verbose = cmd.isSet("v");
 
-        bool useSilver = cmd.isSet("useSilver");
+        // The statistical security parameter.
+        auto ssp = cmd.getOr("ssp", 40);
+
+        // Malicious Security.
+        auto mal = cmd.isSet("malicious");
+
+        // The vole type.
+#ifdef ENABLE_BITPOLYMUL
+        auto useSilver = cmd.isSet("useSilver");
+#else
+        auto useSilver = true;
+#endif
 
         std::cout << "connecting as " << (client ? "client" : "server") << " at ip " << ip << std::endl;
 
@@ -47,6 +59,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
                 boost::asio::ssl::context::tlsv13_server
             );
 
+            // Require that the both parties verify using their cert.
             ctx.set_verify_mode(
                 boost::asio::ssl::verify_peer |
                 boost::asio::ssl::verify_fail_if_no_peer_cert);
@@ -54,6 +67,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
             ctx.use_private_key_file(privateKey, boost::asio::ssl::context::file_format::pem);
             ctx.use_certificate_file(publicKey, boost::asio::ssl::context::file_format::pem);
 
+            // Perform the TCP/IP and TLS handshake.
             sock = coproto::sync_wait(
                 client ?
                 macoro::make_task(coproto::AsioTlsConnect(ip, coproto::global_io_context(), ctx)) :
@@ -66,6 +80,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
         else
         {
 #ifdef COPROTO_ENABLE_BOOST
+            // Perform the TCP/IP.
             sock = coproto::asioConnect(ip, !client);
 #else
             throw std::runtime_error("COPROTO_ENABLE_BOOST must be define (via cmake) to use tcp sockets. " COPROTO_LOCATION);
@@ -73,41 +88,48 @@ void networkSocketExampleRun(const oc::CLP& cmd)
         }
 
         std::cout << "connected" << std::endl;
-
-
         std::vector<oc::block> set;
-        if (cmd.isSet("sender"))
+        if (!recver)
         {
-            volePSI::RsPsiSender sender;
+            // Use dummy set {0,1,...}
             set.resize(ns);
-
             for (oc::u64 i = 0; i < ns; ++i)
                 set[i] = oc::block(0, i);
 
+            // configure
+            volePSI::RsPsiSender sender;
             sender.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
-            sender.init(ns, nr, 40, oc::sysRandomSeed(), false, 1, true);
+            sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, true);
 
             std::cout << "sender start\n";
+            auto start = std::chrono::system_clock::now();
 
+            // Run the protocol.
             macoro::sync_wait(sender.run(set, sock));
 
-            std::cout << "sender done\n";
+            auto done = std::chrono::system_clock::now();
+            std::cout << "sender done, " << std::chrono::duration_cast<std::chrono::microseconds>(done-start).count() <<"ms" << std::endl;
         }
         else
         {
-            volePSI::RsPsiReceiver recevier;
-            recevier.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
+            // Use dummy set {0,1,...}
             set.resize(ns);
-
             for (oc::u64 i = 0; i < ns; ++i)
                 set[i] = oc::block(0, i);
 
-            recevier.init(ns, nr, 40, oc::sysRandomSeed(), false, 1, true);
+            // Configure.
+            volePSI::RsPsiReceiver recevier;
+            recevier.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
+            recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, true);
 
             std::cout << "recver start\n";
+            auto start = std::chrono::system_clock::now();
+
+            // Run the protocol.
             macoro::sync_wait(recevier.run(set, sock));
 
-            std::cout << "recver done\n";
+            auto done = std::chrono::system_clock::now();
+            std::cout << "sender done, " << std::chrono::duration_cast<std::chrono::microseconds>(done-start).count() <<"ms" << std::endl;
         }
 
     }
@@ -120,6 +142,8 @@ void networkSocketExampleRun(const oc::CLP& cmd)
 
 void networkSocketExample(const oc::CLP& cmd)
 {
+    // If the user specified -sender or -recver, then run that party.
+    // Otherwisew run both parties.
     if (cmd.isSet("sender") || cmd.isSet("recver"))
     {
         networkSocketExampleRun(cmd);
@@ -128,7 +152,7 @@ void networkSocketExample(const oc::CLP& cmd)
     {
         auto s = cmd;
         s.set("sender");
-        s.set("client");
+        s.set("server");
         auto a = std::async([&]() {networkSocketExampleRun(s); });
         networkSocketExampleRun(cmd);
         a.get();

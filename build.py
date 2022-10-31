@@ -2,6 +2,7 @@ import os
 import platform
 import sys
 import multiprocessing
+import shutil
 
 def getParallel(args):
     par = multiprocessing.cpu_count()
@@ -146,6 +147,19 @@ def main(projectName, argv):
     if "--help" in argv:
         help()
         return 
+
+
+    if "--clean" in argv:
+        shutil.rmtree("out/")
+        shutil.rmtree("thirdparty/libOTe")
+        shutil.rmtree("thirdparty/libdivide")
+        shutil.rmtree("thirdparty/sparsehash-c11")
+
+    if any("LIBOTE" in arg for arg in argv):
+        shutil.rmtree("out/install")
+    if any("COPROTO" in arg for arg in argv):
+        shutil.rmtree("out/install")
+        shutil.rmtree("thirdparty/libOTe/out/install")
 
     sudo = "--sudo" in argv;
     if not sudo:

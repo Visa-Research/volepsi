@@ -22,8 +22,11 @@ function(RUN)
         "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"
     )
 
+
+    string (REPLACE "%" "\;" PARSED_ARGS_CMD_STR "${PARSED_ARGS_CMD}")
+
     execute_process(
-        COMMAND ${PARSED_ARGS_CMD}
+        COMMAND ${PARSED_ARGS_CMD_STR}
         WORKING_DIRECTORY ${PARSED_ARGS_WD}
         RESULT_VARIABLE RESULT
         COMMAND_ECHO STDOUT

@@ -3,23 +3,33 @@
 #include "volePSI/RsPsi.h"
 #include <fstream>
 
-
-
-
+// This example demonstates how one can get and manually send the protocol messages
+// that are generated. This communicate method is one possible way of doing this.
+// It takes a protocol that has been started and coproto buffering socket as input.
+// It alternates between "sending" and "receiving" protocol messages. Instead of
+// sending the messages on a socket, this program writes them to a file and the other
+// party reads that file to get the message. In a real program the communication could 
+// handled in any way the user decides.
 auto communicate(
     macoro::eager_task<>& protocol,
     bool sender,
     coproto::BufferingSocket& sock,
-    int& s, int& r,
     bool verbose)
 {
+
+    int s = 0, r = 0;
     std::string me = sender ? "sender" : "recver";
     std::string them = !sender ? "sender" : "recver";
 
     // write any outgoing data to a file me_i.bin where i in the message index.
     auto write = [&]()
     {
+        // the the outbound messages that the protocol has generated.
+        // This will consist of all the outbound messages that can be 
+        // generated without receiving the next inbound message.
         auto b = sock.getOutbound();
+
+        // If we do have outbound messages, then lets write them to a file.
         if (b && b->size())
         {
             std::ofstream message;
@@ -29,13 +39,15 @@ auto communicate(
             message.write((char*)b->data(), b->size());
             message.close();
 
-
-            oc::RandomOracle hash(16);
-            hash.Update(b->data(), b->size());
-            oc::block h; hash.Final(h);
-
             if (verbose)
+            {
+                // optional for debug purposes.
+                oc::RandomOracle hash(16);
+                hash.Update(b->data(), b->size());
+                oc::block h; hash.Final(h);
+
                 std::cout << me << " write " << std::to_string(s) << " " << h << "\n";
+            }
 
             if (rename(temp.c_str(), file.c_str()) != 0)
                 std::cout << me << " file renamed failed\n";
@@ -68,21 +80,27 @@ auto communicate(
         message.close();
         std::remove(file.c_str());
 
-
-        oc::RandomOracle hash(16);
-        hash.Update(buff.data(), buff.size());
-        oc::block h; hash.Final(h);
-
         if (verbose)
+        {
+            oc::RandomOracle hash(16);
+            hash.Update(buff.data(), buff.size());
+            oc::block h; hash.Final(h);
+
             std::cout << me << " read " << std::to_string(r) << " " << h << "\n";
+        }
         ++r;
 
+        // This gives this socket the message which forwards it to the protocol and
+        // run the protocol forward, possibly generating more outbound protocol
+        // messages.
         sock.processInbound(buff);
     };
 
+    // The sender we generate the first message.
     if (!sender)
         write();
 
+    // While the protocol is not done we alternate between reading and writing messages.
     while (protocol.is_ready() == false)
     {
         read();
@@ -92,49 +110,81 @@ auto communicate(
 
 void messagePassingExampleRun(oc::CLP& cmd)
 {
-    auto ns = cmd.getOr("ns", 100);
-    auto nr = cmd.getOr("nr", 100);
+    auto receiver = cmd.get<int>("r");
+
+    // The sender set size.
+    auto ns = cmd.getOr("senderSize", 100);
+
+    // The receiver set size.
+    auto nr = cmd.getOr("receiverSize", 100);
     auto verbose = cmd.isSet("v");
 
+    // The statistical security parameter.
+    auto ssp = cmd.getOr("ssp", 40);
+
+    // Malicious Security.
+    auto mal = cmd.isSet("malicious");
+
+    // The vole type.
+#ifdef ENABLE_BITPOLYMUL
+    auto type = cmd.isSet("useSilver") ? oc::MultType::slv5 : oc::MultType::QuasiCyclic;
+#else
+    auto type = oc::MultType::slv5;
+#endif
+
+    // A buffering socket. This socket type internally buffers the 
+    // protocol messages. It is then up to the user to manually send
+    // and receive messages via the getOutbond(...) and processInbount(...)
+    // methods.
     coproto::BufferingSocket sock;
+
+    // Sets are always represented as 16 byte values. To support longer elements one can hash them.
     std::vector<oc::block> set;
-    if (cmd.isSet("sender"))
+    if (!receiver)
     {
         volePSI::RsPsiSender sender;
         set.resize(ns);
 
+        // in this example we use the set {0,1,...}.
         for (oc::u64 i = 0; i < ns; ++i)
             set[i] = oc::block(0, i);
 
-        sender.setMultType(oc::MultType::QuasiCyclic);
-        sender.init(ns, nr, 40, oc::sysRandomSeed(), false, 1, true);
+        sender.setMultType(type);
+        sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, true);
 
         if (verbose)
             std::cout << "sender start\n";
+
+        // Eagerly start the protocol. This will run the protocol up to the point
+        // that it need to receive a message from the other party.
         auto protocol = sender.run(set, sock) | macoro::make_eager();
 
-        int s = 0, r = 0;
-        communicate(protocol, true, sock, s, r, verbose);
+        // Perform the communication and complete the protocol.
+        communicate(protocol, true, sock, verbose);
 
         std::cout << "sender done\n";
     }
     else
     {
-        volePSI::RsPsiReceiver recevier;
-        recevier.setMultType(oc::MultType::QuasiCyclic);
+        // in this example we use the set {0,1,...}.
         set.resize(ns);
-
         for (oc::u64 i = 0; i < ns; ++i)
             set[i] = oc::block(0, i);
 
-        recevier.init(ns, nr, 40, oc::sysRandomSeed(), false, 1, true);
+        volePSI::RsPsiReceiver recevier;
+        recevier.setMultType(type);
+        recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, true);
 
         if (verbose)
             std::cout << "recver start\n";
+
+
+        // Eagerly start the protocol. This will run the protocol up to the point
+        // that it need to receive a message from the other party.
         auto protocol = recevier.run(set, sock) | macoro::make_eager();
 
-        int s = 0, r = 0;
-        communicate(protocol, false, sock, s, r, verbose);
+        // Perform the communication and complete the protocol.
+        communicate(protocol, false, sock, verbose);
 
         std::cout << "recver done\n";
     }
@@ -143,14 +193,17 @@ void messagePassingExampleRun(oc::CLP& cmd)
 
 void messagePassingExample(oc::CLP& cmd)
 {
-    if (cmd.isSet("sender") || cmd.isSet("recver"))
+    // If the user specified -r, then run that party.
+    // Otherwisew run both parties.
+    if (cmd.hasValue("r"))
     {
         messagePassingExampleRun(cmd);
     }
     else
     {
         auto s = cmd;
-        s.set("sender");
+        s.setDefault("r", 0);
+        cmd.setDefault("r", 1);
         auto a = std::async([&]() {messagePassingExampleRun(s); });
         messagePassingExampleRun(cmd);
         a.get();
