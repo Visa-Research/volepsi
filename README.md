@@ -7,15 +7,16 @@ The library is cross platform (win,linux,mac) and depends on [libOTe](https://gi
 
 ### Build
 
-The library can be cloned and built as
+The library can be cloned and built with networking support as
 ```
 git clone ...
 cd volePSI
-python3 build.py
+python3 build.py -DCOPROTO_ENABLE_BOOST=ON -DCOPROTO_ENABLE_OPENSSL=ON
 ```
-Alternatively the user can manualy call cmake.
-The output library `volePSI` and executable `frontend` will be written to `out/build/<platform>/`.
-By defaut dependancies are automaticly downloaded.
+If TCP/IP and or TLS socket support is not required, then a minimal version of the library can be build by calling `python3 build.py`. See the cmake/python output for additional options.
+The user can manualy call cmake as well.
+
+The output library `volePSI` and executable `frontend` will be written to `out/build/<platform>/`. The `frontend` can perform PSI based on files as input sets and communicate via sockets. See the output of `frontend` for details. There is also two example on how to perform [networking](https://github.com/Visa-Research/volepsi/blob/main/frontend/networkSocketExample.h#L7) or [manually](https://github.com/Visa-Research/volepsi/blob/main/frontend/messagePassingExample.h#L93) get & send the protocol messages.
 
 ### Installing
 
