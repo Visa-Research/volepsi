@@ -33,7 +33,7 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
                        -DENABLE_MRR=ON
                        -DENABLE_IKNP=ON
                        -DENABLE_SOFTSPOKEN_OT=ON
-                       -DENABLE_BITPOLYMUL=ON
+                       -DENABLE_BITPOLYMUL=${LIBOTE_ENABLE_BITPOLYMUL}
                        -DENABLE_SILENTOT=ON
                        -DENABLE_SILENT_VOLE=ON
                        ${LIBOTE_OS_ARGS}
