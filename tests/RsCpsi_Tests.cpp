@@ -89,7 +89,7 @@ namespace
 
 void Cpsi_Rs_empty_test(const CLP& cmd)
 {
-    u64 n = cmd.getOr("n", 13243);
+    u64 n = cmd.getOr("n", 133);
     std::vector<block> recvSet(n), sendSet(n);
     PRNG prng(ZeroBlock);
     prng.get(recvSet.data(), recvSet.size());
@@ -142,7 +142,7 @@ void Cpsi_Rs_partial_test(const CLP& cmd)
 
 void Cpsi_Rs_full_test(const CLP& cmd)
 {
-    u64 n = cmd.getOr("n", 13243);
+    u64 n = cmd.getOr("n", 243);
     std::vector<block> recvSet(n), sendSet(n);
     PRNG prng(ZeroBlock);
     prng.get(recvSet.data(), recvSet.size());

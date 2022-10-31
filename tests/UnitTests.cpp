@@ -11,6 +11,7 @@
 #include "RsCpsi_Tests.h"
 #include "GMW_Tests.h"
 #include "volePSI/GMW/Circuit.h"
+#include "FileBase_Tests.h"
 
 namespace volePSI_Tests
 {
@@ -75,5 +76,11 @@ namespace volePSI_Tests
         t.add("Cpsi_Rs_full_test           ", Cpsi_Rs_full_test);
         t.add("Cpsi_Rs_full_add32_test     ", Cpsi_Rs_full_add32_test);
 #endif
+
+        t.add("filebase_readSet_Test       ", filebase_readSet_Test);
+        t.add("filebase_psi_bin_Test       ", filebase_psi_bin_Test);
+        t.add("filebase_psi_csv_Test       ", filebase_psi_csv_Test);
+        t.add("filebase_psi_csvh_Test      ", filebase_psi_csvh_Test);
+
     });
 }

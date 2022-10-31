@@ -6,6 +6,7 @@ set(SRCS
     "RsOprf.cpp"
     "RsPsi.cpp"
     "SimpleIndex.cpp"
+    "fileBased.cpp"
     )
 
 if(VOLE_PSI_ENABLE_GMW)

@@ -42,6 +42,7 @@ option(VOLE_PSI_ENABLE_GMW    "compile the library with GMW" ON)
 option(VOLE_PSI_ENABLE_CPSI   "compile the library with circuit PSI" ON)
 option(VOLE_PSI_ENABLE_OPPRF  "compile the library with OPPRF" ON)
 option(COPROTO_ENABLE_BOOST   "build coproto with boost support" OFF)
+option(COPROTO_ENABLE_OPENSSL   "build coproto with boost openssl support" OFF)
 option(LIBOTE_ENABLE_BITPOLYMUL   "build libOTe with quasiCyclic support" OFF)
 
 if(VOLE_PSI_ENABLE_CPSI)
@@ -58,6 +59,7 @@ message(STATUS "Option: VOLE_PSI_ENABLE_CPSI     = ${VOLE_PSI_ENABLE_CPSI}")
 message(STATUS "Option: VOLE_PSI_ENABLE_OPPRF    = ${VOLE_PSI_ENABLE_OPPRF}\n")
 
 message(STATUS "Option: COPROTO_ENABLE_BOOST     = ${COPROTO_ENABLE_BOOST}\n")
+message(STATUS "Option: COPROTO_ENABLE_OPENSSL   = ${COPROTO_ENABLE_OPENSSL}\n")
 message(STATUS "Option: LIBOTE_ENABLE_BITPOLYMUL = ${LIBOTE_ENABLE_BITPOLYMUL}\n")
 
 
