@@ -132,7 +132,7 @@ namespace volePSI
 
 		for (u64 i = 0; i < counts.size(); ++i) {
 			ValueType& value = i;
-			std::size_t& size = counts[i];
+			u64& size = counts[i];
 			std::fill_n(first, size, value);
 			std::advance(first, size);
 		}
