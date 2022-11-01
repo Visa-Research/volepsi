@@ -2,7 +2,7 @@ set(DEP_NAME            libdivide)
 set(GIT_REPOSITORY      https://github.com/ridiculousfish/libdivide.git)
 set(GIT_TAG             "b322221677351ebb11f0a42fe9a9a2794da5bfe5" )
 
-set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
+set(CLONE_DIR "${VOLE_PSI_THIRDPARTY_CLONE_DIR}/${DEP_NAME}")
 set(BUILD_DIR "${CLONE_DIR}/out/build/${VOLEPSI_CONFIG}")
 set(LOG_FILE  "${CMAKE_CURRENT_LIST_DIR}/log-${DEP_NAME}.txt")
 
@@ -19,7 +19,7 @@ if(NOT LIBDIVIDE_FOUND)
 
     message("============= Building ${DEP_NAME} =============")
     if(NOT EXISTS ${CLONE_DIR})
-        run(NAME "Cloning ${GIT_REPOSITORY}" CMD ${DOWNLOAD_CMD} WD ${CMAKE_CURRENT_LIST_DIR})
+        run(NAME "Cloning ${GIT_REPOSITORY}" CMD ${DOWNLOAD_CMD} WD ${VOLE_PSI_THIRDPARTY_CLONE_DIR})
     endif()
 
     run(NAME "Checkout ${GIT_TAG} " CMD ${CHECKOUT_CMD}  WD ${CLONE_DIR})

@@ -2,10 +2,10 @@
 set(USER_NAME           )      
 set(TOKEN               )      
 set(GIT_REPOSITORY      "https://github.com/osu-crypto/libOTe.git")
-set(GIT_TAG             "a0ad74c9101f383b9cc14bbbd15e88654d8c1558" )
+set(GIT_TAG             "a28751f69ffc6384922b453bc16f1705976e1570" )
 
 set(DEP_NAME            libOTe)          
-set(CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/${DEP_NAME}")
+set(CLONE_DIR "${VOLE_PSI_THIRDPARTY_CLONE_DIR}/${DEP_NAME}")
 set(BUILD_DIR "${CLONE_DIR}/out/build/${VOLEPSI_CONFIG}")
 set(LOG_FILE  "${CMAKE_CURRENT_LIST_DIR}/log-${DEP_NAME}.txt")
 
@@ -43,6 +43,7 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
                        -DCOPROTO_ENABLE_BOOST=${COPROTO_ENABLE_BOOST}
                        -DCOPROTO_ENABLE_OPENSSL=${COPROTO_ENABLE_OPENSSL}
                        -DOC_PIC=${VOLE_PSI_PIC}
+                       -DOC_THIRDPARTY_CLONE_DIR=${VOLE_PSI_THIRDPARTY_CLONE_DIR}
                        )
     set(BUILD_CMD     ${CMAKE_COMMAND} --build ${BUILD_DIR} --config ${CMAKE_BUILD_TYPE})
     set(INSTALL_CMD   ${CMAKE_COMMAND} --install ${BUILD_DIR} --config ${CMAKE_BUILD_TYPE} --prefix ${VOLEPSI_THIRDPARTY_DIR})
@@ -50,7 +51,7 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
 
     message("============= Building ${DEP_NAME} =============")
     if(NOT EXISTS ${CLONE_DIR})
-        run(NAME "Cloning ${GIT_REPOSITORY}" CMD ${DOWNLOAD_CMD} WD ${CMAKE_CURRENT_LIST_DIR})
+        run(NAME "Cloning ${GIT_REPOSITORY}" CMD ${DOWNLOAD_CMD} WD ${VOLE_PSI_THIRDPARTY_CLONE_DIR})
     endif()
 
 
@@ -68,10 +69,12 @@ else()
 endif()
 
 install(CODE "
-    execute_process(
-        COMMAND ${SUDO} \${CMAKE_COMMAND} --install ${BUILD_DIR}  --config ${CMAKE_BUILD_TYPE} --prefix \${CMAKE_INSTALL_PREFIX}
-        WORKING_DIRECTORY ${CLONE_DIR}
-        RESULT_VARIABLE RESULT
-        COMMAND_ECHO STDOUT
-    )
+    if(NOT CMAKE_INSTALL_PREFIX STREQUAL \"${VOLE_PSI_THIRDPARTY_CLONE_DIR}\")
+        execute_process(
+            COMMAND ${SUDO} \${CMAKE_COMMAND} --install ${BUILD_DIR}  --config ${CMAKE_BUILD_TYPE} --prefix \${CMAKE_INSTALL_PREFIX}
+            WORKING_DIRECTORY ${CLONE_DIR}
+            RESULT_VARIABLE RESULT
+            COMMAND_ECHO STDOUT
+        )
+    endif()
 ")

@@ -27,7 +27,6 @@ macro(FIND_SPARSEHASH)
     endif()
 endmacro()
 
-message("FETCH_SPARSEHASH_AUTO=${FETCH_SPARSEHASH_AUTO}")
 if(FETCH_SPARSEHASH_AUTO)
     FIND_SPARSEHASH(QUIET)
     include(${CMAKE_CURRENT_LIST_DIR}/../thirdparty/getSparsehash.cmake)

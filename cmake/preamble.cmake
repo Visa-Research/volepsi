@@ -94,3 +94,7 @@ else()
 	endif()
 endif()
 
+
+if(NOT VOLE_PSI_THIRDPARTY_CLONE_DIR)
+	get_filename_component(VOLE_PSI_THIRDPARTY_CLONE_DIR "${CMAKE_CURRENT_LIST_DIR}/../out/" ABSOLUTE)
+endif()
