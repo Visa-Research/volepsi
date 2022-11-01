@@ -9,8 +9,8 @@ The library is cross platform (win,linux,mac) and depends on [libOTe](https://gi
 
 The library can be cloned and built with networking support as
 ```
-git clone ...
-cd volePSI
+git clone https://github.com/Visa-Research/volepsi.git
+cd volepsi
 python3 build.py -DCOPROTO_ENABLE_BOOST=ON -DCOPROTO_ENABLE_OPENSSL=ON
 ```
 If TCP/IP and or TLS socket support is not required, then a minimal version of the library can be build by calling `python3 build.py`. See the cmake/python output for additional options.
