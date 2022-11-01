@@ -9,6 +9,7 @@
             "binaryDir": "${sourceDir}/out/build/${presetName}",
             "cacheVariables": {
                 "FETCH_AUTO": true,
+                "VOLE_PSI_PIC":true,
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_PREFIX_PATH": "/usr/local/opt/openssl/",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"

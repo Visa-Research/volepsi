@@ -42,6 +42,7 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
                        -DENABLE_SSE=${VOLE_PSI_ENABLE_SSE}
                        -DCOPROTO_ENABLE_BOOST=${COPROTO_ENABLE_BOOST}
                        -DCOPROTO_ENABLE_OPENSSL=${COPROTO_ENABLE_OPENSSL}
+                       -DOC_PIC=${VOLE_PSI_PIC}
                        )
     set(BUILD_CMD     ${CMAKE_COMMAND} --build ${BUILD_DIR} --config ${CMAKE_BUILD_TYPE})
     set(INSTALL_CMD   ${CMAKE_COMMAND} --install ${BUILD_DIR} --config ${CMAKE_BUILD_TYPE} --prefix ${VOLEPSI_THIRDPARTY_DIR})
