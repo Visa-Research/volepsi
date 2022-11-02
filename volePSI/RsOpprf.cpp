@@ -50,6 +50,15 @@ namespace volePSI
 		}
 	}
 
+
+	struct DD
+	{
+		~DD()
+		{
+			std::cout << "DD" << std::endl;
+		}
+	};
+
 	Proto RsOpprfSender::send(u64 recverSize, span<const block> X, MatrixView<u8> val, PRNG& prng, u64 numThreads, Socket& chl)
 	{
 		MC_BEGIN(Proto,this, recverSize, X, val, &prng, numThreads, &chl,
@@ -60,7 +69,8 @@ namespace volePSI
 			type = PaxosParam::Binary,
 
 			diffPtr = std::unique_ptr<u8[]> {},
-			diffU8 = span<u8> {}
+			diffU8 = span<u8> {},
+			dd = DD{}
 			);
 
 		setTimePoint("RsOpprfSender::send begin");
