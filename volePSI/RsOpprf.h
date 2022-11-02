@@ -54,7 +54,7 @@ namespace volePSI
 	{
 		BasicVector() = default;
 		BasicVector(BasicVector&& o) { asSpan() = o.asSpan(); o.asSpan() = {}; };
-		BasicVector& operator=(BasicVector&& o) { asSpan() = o.asSpan(); o.asSpan() = {}; return *this; };
+		BasicVector& operator=(BasicVector&& o) { clear();  asSpan() = o.asSpan(); o.asSpan() = {}; return *this; };
 
 		span<T>& asSpan() { return static_cast<span<T>&>(*this); }
 		operator span<T>& () { return asSpan(); }
@@ -64,17 +64,20 @@ namespace volePSI
 			resize(size);
 		}
 
-		~BasicVector()
+		auto clear()
 		{
 			if (asSpan().data())
 				delete[] asSpan().data();
+		}
 
+		~BasicVector()
+		{
+			clear();
 		}
 
 		void resize(u64 size)
 		{
-			if (asSpan().data())
-				delete[] asSpan().data();
+			clear();
 			asSpan() = span<T>(new T[size], size);
 		}
 
