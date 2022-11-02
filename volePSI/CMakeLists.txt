@@ -47,10 +47,22 @@ elseif(MSVC)
             CXX_STANDARD_REQUIRED YES
             CXX_EXTENSIONS NO
     )
+
+    if(VOLE_PSI_ENABLE_ASAN)
+        message("\n\nasan\n\n")
+        target_compile_options(volePSI PUBLIC "/fsanitize=address")
+        target_link_options(volePSI PUBLIC "/fsanitize=address")
+    endif()
 else()
     target_compile_options(volePSI PUBLIC
         "-std=c++${VOLE_PSI_CPP_VER}"
     )    
+
+    if(VOLE_PSI_ENABLE_ASAN)
+        message("\n\nasan\n\n")
+        target_compile_options(volePSI PUBLIC "-fsanitize=address")
+        target_link_options(volePSI PUBLIC "-fsanitize=address")
+    endif()
 endif()
 
 if(MSVC)

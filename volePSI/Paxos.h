@@ -86,7 +86,7 @@ namespace volePSI
 		PaxosHash<IdxType> mHasher;
 
 		// an allocate used for the encoding algorithm
-		std::unique_ptr<u8> mAllocation;
+		std::unique_ptr<u8[]> mAllocation;
 		u64 mAllocationSize = 0;
 
 		// The dense part of the paxos matrix

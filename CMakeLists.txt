@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 3.15)
 
 project(volePSI VERSION 0.0.1)
 
+set(VOLEPSI_BUILD ON)
 
 # sets some variables
 include(cmake/preamble.cmake)

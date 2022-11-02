@@ -268,7 +268,7 @@ namespace volePSI
 
     struct UninitVec : span<block>
     {
-        std::unique_ptr<block> ptr;
+        std::unique_ptr<block[]> ptr;
 
         void resize(u64 s)
         {

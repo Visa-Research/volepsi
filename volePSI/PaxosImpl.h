@@ -2679,47 +2679,48 @@ namespace volePSI
 		auto itemsPerThrd = (mNumItems + numThreads - 1) / numThreads;
 
 		// maximum number of items any single thread will map to a bin.
-		auto perThrdBinSize = getBinSize(mNumBins, itemsPerThrd, mSsp);
+		auto perThrdMaxBinSize = getBinSize(mNumBins, itemsPerThrd, mSsp);
 
-		// the size of the
-		u64 totalBinSize = perThrdBinSize * numThreads;
+		// the combined max size of the i'th bin held by each thread.
+		u64 combinedMaxBinSize = perThrdMaxBinSize * numThreads;
 
-		// keeps track of the size of each bin for each thread.
+		// keeps track of the size of each bin for each thread. Additional spaces to prevent false sharing
 		Matrix<u64> thrdBinSizes(numThreads, mNumBins);
 
 		// keeps track of input index of each item in each bin,thread.
-		std::unique_ptr<u64[]> inputMapping(new u64[totalNumBins * perThrdBinSize]);
+		std::unique_ptr<u64[]> inputMapping(new u64[totalNumBins * perThrdMaxBinSize]);
 
 		// for the given thread, bin, return the list which map the bin 
 		// value back to the input value.
 		auto getInputMapping = [&](u64 thrdIdx, u64 binIdx)
 		{
-			auto binBegin = totalBinSize * binIdx;
-			auto thrdBegin = perThrdBinSize * thrdIdx;
-			span<u64> mapping(inputMapping.get() + binBegin + thrdBegin, perThrdBinSize);
+			auto binBegin = combinedMaxBinSize * binIdx;
+			auto thrdBegin = perThrdMaxBinSize * thrdIdx;
+			span<u64> mapping(inputMapping.get() + binBegin + thrdBegin, perThrdMaxBinSize);
+			assert(inputMapping.get() + totalNumBins * perThrdMaxBinSize >= mapping.data() + mapping.size());
 			return mapping;
 		};
 
-		auto valBacking = h.newVec(totalNumBins * perThrdBinSize);
+		auto valBacking = h.newVec(totalNumBins * perThrdMaxBinSize);
 
 		// get the values mapped to the given bin by the given thread.
 		auto getValues = [&](u64 thrdIdx, u64 binIdx)
 		{
-			auto binBegin = totalBinSize * binIdx;
-			auto thrdBegin = perThrdBinSize * thrdIdx;
+			auto binBegin = combinedMaxBinSize * binIdx;
+			auto thrdBegin = perThrdMaxBinSize * thrdIdx;
 
-			return valBacking.subspan(binBegin + thrdBegin, perThrdBinSize);
+			return valBacking.subspan(binBegin + thrdBegin, perThrdMaxBinSize);
 		};
 
-		std::unique_ptr<block[]> hashBacking(new block[totalNumBins * perThrdBinSize]);
+		std::unique_ptr<block[]> hashBacking(new block[totalNumBins * perThrdMaxBinSize]);
 
 		// get the hashes mapped to the given bin by the given thread.
 		auto getHashes = [&](u64 thrdIdx, u64 binIdx)
 		{
-			auto binBegin = totalBinSize * binIdx;
-			auto thrdBegin = perThrdBinSize * thrdIdx;
+			auto binBegin = combinedMaxBinSize * binIdx;
+			auto thrdBegin = perThrdMaxBinSize * thrdIdx;
 
-			return span<block>(hashBacking.get() + binBegin + thrdBegin, perThrdBinSize);
+			return span<block>(hashBacking.get() + binBegin + thrdBegin, perThrdMaxBinSize);
 		};
 
 
@@ -2784,7 +2785,7 @@ namespace volePSI
 
 					auto binIdx = modNumBins(hashes[k]);
 					auto bs = binSizes[binIdx]++;
-					assert(bs < perThrdBinSize);
+					assert(bs < perThrdMaxBinSize);
 					getInputMapping(thrdIdx, binIdx)[bs] = inIdx;
 					h.assign(getValues(thrdIdx, binIdx)[bs], vals_[inIdx]);
 					getHashes(thrdIdx, binIdx)[bs] = hashes[k];
@@ -2800,7 +2801,7 @@ namespace volePSI
 				sizeof(span<IdxType>) * mPaxosParam.mSparseSize /*+
 				sizeof(block) * mItemsPerBin*/;
 
-			std::unique_ptr<u8> allocation(new u8[allocSize]);
+			std::unique_ptr<u8[]> allocation(new u8[allocSize]);
 
 
 			// block until all threads have mapped all items. 
@@ -2837,7 +2838,7 @@ namespace volePSI
 				if (iter > allocation.get() + allocSize)
 					throw RTE_LOC;
 
-				auto binBegin = totalBinSize * binIdx;
+				auto binBegin = combinedMaxBinSize * binIdx;
 				auto values = valBacking.subspan(binBegin, binSize);
 				auto hashes = span<block>(hashBacking.get() + binBegin, binSize);
 				auto output = p_.subspan(paxosSizePer * binIdx, paxosSizePer);
@@ -2845,13 +2846,28 @@ namespace volePSI
 				//for each thread, copy the hashes,values that it mapped
 				//to this bin. 
 				u64 binPos = thrdBinSizes(0, binIdx);
+				assert(binPos <= perThrdMaxBinSize);
+				assert(hashes.data() == getHashes(0, binIdx).data());
+
 				for (u64 i = 1; i < numThreads; ++i)
 				{
 					auto size = thrdBinSizes(i, binIdx);
+					assert(size <= perThrdMaxBinSize);
 					auto thrdHashes = getHashes(i, binIdx);
 					auto thrdVals = getValues(i, binIdx);
 
-					memcpy(hashes.data() + binPos, thrdHashes.data(), size * sizeof(block));
+					//u8* db = (u8*)(hashes.data() + binPos);
+					//u8* de = db + size * sizeof(block);
+					//u8* sb = (u8*)thrdHashes.data();
+					//u8* se = sb + size * sizeof(block);
+
+					//if ((block*)sb != hashes.data() + i * perThrdMaxBinSize)
+					//	throw RTE_LOC;
+
+					//if(de > sb)
+					//	throw RTE_LOC;
+
+					memmove(hashes.data() + binPos, thrdHashes.data(), size * sizeof(block));
 					//memcpy(values.data() + binPos, thrdVals.data() , size * sizeof(block));
 					for (u64 j = 0; j < size; ++j)
 						h.assign(values[binPos + j], thrdVals[j]);

@@ -10,7 +10,7 @@ namespace volePSI
     template <typename T>
     struct Buffer : public span<T>
     {
-        std::unique_ptr<T> mPtr;
+        std::unique_ptr<T[]> mPtr;
 
         void resize(u64 s)
         {
@@ -67,7 +67,15 @@ namespace volePSI
         {
             auto src = (block*)hashes.data();
             auto dest = (u8*)hashes.data();
-            for (u64 i = 0; i < mSenderSize; ++i)
+            u64 i = 0;
+
+            for (; i < std::min<u64>(mSenderSize, 100); ++i)
+            {
+                memmove(dest, src, mMaskSize);
+                dest += mMaskSize;
+                src += 1;
+            }
+            for (; i < mSenderSize; ++i)
             {
                 memcpy(dest, src, mMaskSize);
                 dest += mMaskSize;

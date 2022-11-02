@@ -72,6 +72,9 @@ endif()
 
 if(VOLEPSI_IN_BUILD_TREE)
 
+	if(VOLEPSI_BUILD)
+		set(VOLEPSI_BUILD_DIR ${CMAKE_BINARY_DIR})
+	endif()
     # we currenty are in the vole psi source tree, vole-psi/cmake
 	if(NOT DEFINED VOLEPSI_BUILD_DIR)
 		set(VOLEPSI_BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/../out/build/${VOLEPSI_CONFIG}")
