@@ -52,6 +52,7 @@ elseif(MSVC)
         message("\n\nasan\n\n")
         target_compile_options(volePSI PUBLIC "/fsanitize=address")
         target_link_options(volePSI PUBLIC "/fsanitize=address")
+
     endif()
 else()
     target_compile_options(volePSI PUBLIC
@@ -60,7 +61,7 @@ else()
 
     if(VOLE_PSI_ENABLE_ASAN)
         message("\n\nasan\n\n")
-        target_compile_options(volePSI PUBLIC "-fsanitize=address")
+        target_compile_options(volePSI PUBLIC "-fsanitize=address" "-ftime-report")
         target_link_options(volePSI PUBLIC "-fsanitize=address")
     endif()
 endif()

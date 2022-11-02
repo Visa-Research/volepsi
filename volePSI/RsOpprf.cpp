@@ -69,8 +69,7 @@ namespace volePSI
 			type = PaxosParam::Binary,
 
 			diffPtr = std::unique_ptr<u8[]> {},
-			diffU8 = span<u8> {},
-			dd = DD{}
+			diffU8 = span<u8> {}
 			);
 
 		setTimePoint("RsOpprfSender::send begin");
@@ -136,6 +135,7 @@ namespace volePSI
 
 			mPaxos.solve<u8>(X, diff, P, &prng, numThreads);
 		}
+		diffPtr.reset();
 
 		setTimePoint("RsOpprfSender::send paxos solve");
 
@@ -269,9 +269,11 @@ namespace volePSI
 					memcpy(&outputs(i * m), &oprfOutput[i], m);
 			}
 
+			temp = {};
 			paxos.mAddToDecode = true;
 			paxos.decode<u8>(values, outputs, p, numThreads);
 		}
+		temp = {};
 
 		setTimePoint("RsOpprfReceiver::receive end");
 

@@ -64,12 +64,22 @@ namespace volePSI
 			resize(size);
 		}
 
+		~BasicVector()
+		{
+			if (asSpan().data())
+				delete[] asSpan().data();
+
+		}
+
 		void resize(u64 size)
 		{
 			if (asSpan().data())
 				delete[] asSpan().data();
 			asSpan() = span<T>(new T[size], size);
 		}
+
+
+
 	};
 
 
