@@ -10,30 +10,9 @@
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "VOLE_PSI_ENABLE_ASAN": true,
+        "VOLE_PSI_ENABLE_ASAN": false,
         "FETCH_AUTO": "ON",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
-        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" }
-      }
-    },
-
-    {
-      "name": "wsllinux",
-      "displayName": "wsllinux",
-      "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "VOLE_PSI_THIRDPARTY_CLONE_DIR": "/home/peter/volepsi/out/",
-        "VOLEPSI_THIRDPARTY_DIR": "/home/peter/volepsi/out/install/${presetName}",
-        "VOLE_PSI_ENABLE_ASAN": true,
-        "FETCH_AUTO": "ON",
-        "CMAKE_INSTALL_PREFIX": "/home/peter/volepsi/out/install/${presetName}"
-
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
@@ -53,7 +32,7 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "FETCH_AUTO": "ON",
-        "VOLE_PSI_ENABLE_ASAN": true,
+        "VOLE_PSI_ENABLE_ASAN": false,
         "COPROTO_ENABLE_BOOST": true,
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       },

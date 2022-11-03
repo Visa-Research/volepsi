@@ -30,7 +30,7 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: build 
         run: |
-          python3 build.py -DVERBOSE_FETCH=ON -DVOLE_PSI_ENABLE_ASAN=ON
+          python3 build.py -DVERBOSE_FETCH=ON -DVOLE_PSI_ENABLE_ASAN=OFF
                         
       - name: unit test
         run: |
