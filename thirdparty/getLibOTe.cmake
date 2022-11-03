@@ -2,7 +2,7 @@
 set(USER_NAME           )      
 set(TOKEN               )      
 set(GIT_REPOSITORY      "https://github.com/osu-crypto/libOTe.git")
-set(GIT_TAG             "8cc728d40c997d5592876348fd525eea80a23966" )
+set(GIT_TAG             "3d1ecb211a2421a670f787131ea1fb2d477ff128" )
 
 set(DEP_NAME            libOTe)          
 set(CLONE_DIR "${VOLE_PSI_THIRDPARTY_CLONE_DIR}/${DEP_NAME}")
@@ -54,8 +54,6 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
         run(NAME "Cloning ${GIT_REPOSITORY}" CMD ${DOWNLOAD_CMD} WD ${VOLE_PSI_THIRDPARTY_CLONE_DIR})
     endif()
 
-
-    message("\n\nCONFIGURE_CMD=${CONFIGURE_CMD}\n\n")
 
     run(NAME "libOTe Checkout ${GIT_TAG} " CMD ${CHECKOUT_CMD}  WD ${CLONE_DIR})
     run(NAME "libOTe submodule"       CMD ${SUBMODULE_CMD} WD ${CLONE_DIR})

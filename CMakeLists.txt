@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 3.15)
 
-project(volePSI VERSION 0.0.1)
+project(volePSI VERSION 0.1.0)
 
 set(VOLEPSI_BUILD ON)
 
