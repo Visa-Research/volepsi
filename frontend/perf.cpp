@@ -419,8 +419,8 @@ void perfPSI(oc::CLP& cmd)
 		r.setTimePoint("begin");
 		timer.setTimePoint("begin");
 		auto r = macoro::sync_wait(macoro::when_all_ready(std::move(p0), std::move(p1)));
-		std::get<0>(r).result();
-		std::get<1>(r).result();
+		try{ std::get<0>(r).result(); } catch(std::exception& e) {std::cout << e.what() << std::endl; }
+		try{ std::get<1>(r).result(); } catch(std::exception& e) {std::cout << e.what() << std::endl; }
 		timer.setTimePoint("end");
 
 	}
