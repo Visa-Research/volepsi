@@ -55,6 +55,7 @@ namespace volePSI
             mSender.setTimer(getTimer());
 
         mSender.mMalicious = mMalicious;
+        mSender.mSsp = mSsp;
         MC_AWAIT(mSender.send(mRecverSize, mPrng, chl, mNumThreads, mUseReducedRounds));
 
         setTimePoint("RsPsiSender::run-opprf");
@@ -132,8 +133,9 @@ namespace volePSI
             mt = std::unique_ptr<MultiThread>{},
             mask = block{}
         );
-        setTimePoint("RsPsiReceiver::run-begin");
 
+        setTimePoint("RsPsiReceiver::run-begin");
+        mIntersection.clear();
 
         data = std::unique_ptr<u8[]>(new u8[
                 mSenderSize * mMaskSize +
@@ -148,6 +150,7 @@ namespace volePSI
             mRecver.setTimer(getTimer());
 
         mRecver.mMalicious = mMalicious;
+        mRecver.mSsp = mSsp;
 
         // todo, parallelize these two
         MC_AWAIT(mRecver.receive(inputs, myHashes, mPrng, chl, mNumThreads, mUseReducedRounds));

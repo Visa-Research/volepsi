@@ -10,6 +10,10 @@ int main(int argc, char** argv)
 {
     oc::CLP cmd(argc, argv);
 
+    //std::ofstream file("./set.csv");
+    //for (oc::u64 i = 0; i < 10000000; ++i)
+    //    file << std::setfill('0') << std::setw(32) << i << "\n";
+    //return 0;
     if (cmd.isSet("in"))
     {
         volePSI::doFilePSI(cmd);
