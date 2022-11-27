@@ -279,7 +279,7 @@ void insertDuplicates(
 	auto n = rows.rows();
 	PaxosParam param;
 	param.mSparseSize = n * 1.4;
-	param.mDenseSize = 40 + g;
+	param.mDenseSize = dt == PaxosParam::DenseType::Binary ? g + 40 : g;
 	param.mG = g;
 	param.mDt = dt;
 	param.mSsp = 40;
@@ -324,6 +324,47 @@ void insertDuplicates(
 
 }
 
+
+
+
+void insertCycle(
+	Paxos<u64>& paxos,
+	Matrix<u64>& rows,
+	span<block> dense,
+	u64 g,
+	PRNG& prng,
+	PaxosParam::DenseType dt)
+{
+	auto w = rows.cols();
+	auto n = rows.rows();
+	PaxosParam param;
+	param.mSparseSize = n + w - g;
+	param.mDenseSize = dt == PaxosParam::DenseType::Binary ? g + 40 : g;
+	param.mWeight = w;
+	param.mG = g;
+	param.mSsp = 40;
+	param.mDt = dt;
+
+	for (u64 i = 0; i < n - g; ++i)
+	{
+		for (u64 j = 0; j < w; ++j)
+			rows(i, j) = i + j;
+	}
+	for (u64 i = n - g; i < n; ++i)
+	{
+		std::set<u64> ss;
+		while (ss.size() < w)
+			ss.insert(prng.get<u64>() % param.mSparseSize);
+		u64 j = 0;
+		for (auto s : ss)
+			rows(i, j++) = s;
+	}
+
+	prng.get<block>(dense);
+	paxos.init(n, param, ZeroBlock);
+	paxos.setInput(rows, dense);
+}
+
 void Paxos_solve_gap_Test(const oc::CLP& cmd)
 {
 
@@ -336,34 +377,41 @@ void Paxos_solve_gap_Test(const oc::CLP& cmd)
 	u64 t = cmd.getOr("t", 1);
 	u64 g = cmd.getOr("g", 3);
 
-	for (auto dt : { PaxosParam::Binary , PaxosParam::GF128 })
+	for (auto dup : { false, true })
 	{
-		for (u64 tt = 0; tt < t; ++tt)
+
+		for (auto dt : { PaxosParam::Binary , PaxosParam::GF128 })
 		{
-			Paxos<u64> paxos;
-			Matrix<u64> rows(n, w);
-			PRNG prng(block(tt, s));
-
-			std::vector<block> dense(n);
-
-			insertDuplicates(paxos, rows, dense, g, prng, dt);
-
-			std::vector<block> values(n), p(paxos.size());
-			prng.get<block>(values);
-			paxos.encode<block>(values, p);
-
-
-			PxVector<block> PP(p);
-			auto h = PP.defaultHelper();
-			for (u64 i = 0; i < n; ++i)
+			for (u64 tt = 0; tt < t; ++tt)
 			{
-				block values2;
-				paxos.decode1<block>(rows[i].data(), &dense[i], &values2, PP, h);
-				if (values2 != values[i])
-				{
-					throw RTE_LOC;
-				}
+				Paxos<u64> paxos;
+				Matrix<u64> rows(n, w);
+				PRNG prng(block(tt, s));
 
+				std::vector<block> dense(n);
+
+				if (dup)
+					insertDuplicates(paxos, rows, dense, g, prng, dt);
+				else
+					insertCycle(paxos, rows, dense, g, prng, dt);
+
+				std::vector<block> values(n), p(paxos.size());
+				prng.get<block>(values);
+				paxos.encode<block>(values, p);
+
+
+				PxVector<block> PP(p);
+				auto h = PP.defaultHelper();
+				for (u64 i = 0; i < n; ++i)
+				{
+					block values2;
+					paxos.decode1<block>(rows[i].data(), &dense[i], &values2, PP, h);
+					if (values2 != values[i])
+					{
+						throw RTE_LOC;
+					}
+
+				}
 			}
 		}
 	}
@@ -432,7 +480,7 @@ void Paxos_solve_rand_gap_Test(const oc::CLP& cmd)
 	double e = 1.4;
 	u64 w = 3;
 	u64 s = 0;
-	u64 g = 3;
+	u64 g = 1;
 
 	for (auto dt : { PaxosParam::Binary , PaxosParam::GF128 })
 	{
@@ -488,7 +536,7 @@ void Paxos_solve_rand_gap_Test(const oc::CLP& cmd)
 		for (u64 i = 0; i < p.size(); ++i)
 			p[i] = oc::ZeroBlock;
 
-
+		paxos.mDebug = true;
 		paxos.encode<block>(values, p, &prng);
 
 		for (u64 i = 0; i < p.size(); ++i)
@@ -516,12 +564,18 @@ void Paxos_solve_rand_gap_Test(const oc::CLP& cmd)
 	}
 }
 
+namespace volePSI
+{
+
+	block hexToBlock(const std::string& buff);
+}
+
 
 void Baxos_solve_Test(const oc::CLP& cmd)
 {
 
 	u64 n = cmd.getOr("n", 1ull << cmd.getOr("nn", 10));
-	u64 b = cmd.getOr("b", n / 4);
+	u64 b = cmd.getOr("b", n/4);
 	u64 w = cmd.getOr("w", 3);
 	u64 s = cmd.getOr("s", 0);
 	//u64 v = cmd.getOr("v", cmd.isSet("v") ? 1 : 0);
@@ -1096,110 +1150,125 @@ void Paxos_invE_Test(const oc::CLP& cmd)
 		}
 	}
 
-	for (u64 i = 0; i < t; ++i)
+	for (auto dup : { false, true })
 	{
-		Paxos<u64> paxos;
-		Matrix<u64> rows(n, w);
-		PRNG prng(block(i, s));
-
-		std::vector<block> dense(n);
-
-		insertDuplicates(paxos, rows, dense, g, prng, PaxosParam::Binary);
-
-		auto tri = paxos.getTriangulization();
-		auto A = tri.getA();
-		auto B = tri.getB();
-		auto C = tri.getC();
-		auto D = tri.getD();
-		auto E = tri.getE();
-		auto F = tri.getF();
-		if (v)
+		for (u64 i = 0; i < t; ++i)
 		{
+			Paxos<u64> paxos;
+			Matrix<u64> rows(n, w);
+			PRNG prng(block(i, s));
 
-			std::cout << "H\n" << tri.mH << std::endl;
-			std::cout << "A\n" << A << std::endl;
-			std::cout << "B\n" << B << std::endl;
-			std::cout << "C\n" << C << std::endl;
-			std::cout << "D\n" << D << std::endl;
-			std::cout << "E\n" << E << std::endl;
-			std::cout << "F\n" << F << std::endl;
+			std::vector<block> dense(n);
+
+			if (dup)
+				insertDuplicates(paxos, rows, dense, g, prng, PaxosParam::Binary);
+			else
+				insertCycle(paxos, rows, dense, g, prng, PaxosParam::Binary);
+
+
+			PointList Hpl(n, paxos.size());
+			for (u64 i = 0; i < n; ++i)
+				for (u64 j = 0; j < w; ++j)
+					Hpl.push_back({ i, rows(i,j) });
+
+			if (v)
+				std::cout << "H*\n" << SparseMtx(Hpl) << std::endl;
+
+			auto tri = paxos.getTriangulization();
+			auto A = tri.getA();
+			auto B = tri.getB();
+			auto C = tri.getC();
+			auto D = tri.getD();
+			auto E = tri.getE();
+			auto F = tri.getF();
+			if (v)
+			{
+
+				std::cout << "H\n" << tri.mH << std::endl;
+				std::cout << "A\n" << A << std::endl;
+				std::cout << "B\n" << B << std::endl;
+				std::cout << "C\n" << C << std::endl;
+				std::cout << "D\n" << D << std::endl;
+				std::cout << "E\n" << E << std::endl;
+				std::cout << "F\n" << F << std::endl;
+			}
+
+			auto CInv = C.invert();
+			if (CInv.rows() == 0)
+				throw RTE_LOC;
+
+			//  D' = -FC^-1A + D
+			//  E' = -FC^-1B + E
+
+			auto FCinv = F * CInv;
+			auto FCinvB = FCinv * B;
+			auto DD = F * CInv * A + D;
+			auto EE = FCinvB + E;
+
+			if (v)
+			{
+
+				std::cout << "DD\n" << DD << std::endl;
+				std::cout << "EE\n" << EE << std::endl;
+				std::cout << "FC\n" << FCinv << std::endl;
+				std::cout << "FCB\n" << FCinvB << std::endl;
+			}
+
+			auto EEInv = EE.invert();
+			if (EEInv.rows() == 0)
+				throw RTE_LOC;
+
+
+			//  r <- $
+			//  x2' = x2 - D'r - FC^-1 x1
+			//  p1 = -E'^-1 x2'
+			//  x1' = x1 - A r - B p1
+			//  p2 = -C^-1 x1'
+			// 
+			//  P = | r p2 p1 |
+
+			std::vector<u8> x(n), p(paxos.size());
+			prng.get<u8>(x);
+
+			span<u8> r(p.begin(), p.begin() + A.cols());
+			span<u8> p1(p.begin() + A.cols(), p.begin() + A.cols() + B.cols());
+			span<u8> p2(p.begin() + A.cols() + B.cols(), p.end());
+
+			std::vector<u8> x1(x.begin(), x.begin() + C.cols());
+			std::vector<u8> x2(x.begin() + C.cols(), x.end());
+
+			// optionally randomize r (ie p).
+			prng.get<u8>(r);
+
+			// x2' = x2 - D' r - FC^-1 x1
+			std::vector<u8> xx2(x2.begin(), x2.end());
+			DD.multAdd(r, xx2);
+			FCinv.multAdd(x1, xx2);
+
+			// p1 = E'^-1 x2'
+			EEInv.multAdd(xx2, p1);
+
+			//  x1' = x1 - A r - B p1
+			std::vector<u8> xx1(x1.begin(), x1.end());
+			A.multAdd(r, xx1);
+			B.multAdd(p1, xx1);
+
+			//  p2 = C^-1 x1'
+			CInv.multAdd(xx1, p2);
+
+			if (C.mult(p2) != xx1)
+				throw RTE_LOC;
+
+			std::vector<u8> yy = tri.mH.mult(p);
+
+			std::vector<u8> yy1(yy.begin(), yy.begin() + C.cols());
+			std::vector<u8> yy2(yy.begin() + C.cols(), yy.end());
+
+			if (yy1 != x1)
+				throw RTE_LOC;
+			if (yy2 != x2)
+				throw RTE_LOC;
 		}
-
-		auto CInv = C.invert();
-		if (CInv.rows() == 0)
-			throw RTE_LOC;
-
-		//  D' = -FC^-1A + D
-		//  E' = -FC^-1B + E
-
-		auto FCinv = F * CInv;
-		auto FCinvB = FCinv * B;
-		auto DD = F * CInv * A + D;
-		auto EE = FCinvB + E;
-
-		if (v)
-		{
-
-			std::cout << "DD\n" << DD << std::endl;
-			std::cout << "EE\n" << EE << std::endl;
-			std::cout << "FC\n" << FCinv << std::endl;
-			std::cout << "FCB\n" << FCinvB << std::endl;
-		}
-
-		auto EEInv = EE.invert();
-		if (EEInv.rows() == 0)
-			throw RTE_LOC;
-
-
-		//  r <- $
-		//  x2' = x2 - D'r - FC^-1 x1
-		//  p1 = -E'^-1 x2'
-		//  x1' = x1 - A r - B p1
-		//  p2 = -C^-1 x1'
-		// 
-		//  P = | r p2 p1 |
-
-		std::vector<u8> x(n), p(paxos.size());
-		prng.get<u8>(x);
-
-		span<u8> r(p.begin(), p.begin() + A.cols());
-		span<u8> p1(p.begin() + A.cols(), p.begin() + A.cols() + B.cols());
-		span<u8> p2(p.begin() + A.cols() + B.cols(), p.end());
-
-		std::vector<u8> x1(x.begin(), x.begin() + C.cols());
-		std::vector<u8> x2(x.begin() + C.cols(), x.end());
-
-		// optionally randomize r (ie p).
-		prng.get<u8>(r);
-
-		// x2' = x2 - D' r - FC^-1 x1
-		std::vector<u8> xx2(x2.begin(), x2.end());
-		DD.multAdd(r, xx2);
-		FCinv.multAdd(x1, xx2);
-
-		// p1 = E'^-1 x2'
-		EEInv.multAdd(xx2, p1);
-
-		//  x1' = x1 - A r - B p1
-		std::vector<u8> xx1(x1.begin(), x1.end());
-		A.multAdd(r, xx1);
-		B.multAdd(p1, xx1);
-
-		//  p2 = C^-1 x1'
-		CInv.multAdd(xx1, p2);
-
-		if (C.mult(p2) != xx1)
-			throw RTE_LOC;
-
-		std::vector<u8> yy = tri.mH.mult(p);
-
-		std::vector<u8> yy1(yy.begin(), yy.begin() + C.cols());
-		std::vector<u8> yy2(yy.begin() + C.cols(), yy.end());
-
-		if (yy1 != x1)
-			throw RTE_LOC;
-		if (yy2 != x2)
-			throw RTE_LOC;
 	}
 }
 

@@ -21,7 +21,7 @@ namespace volePSI
         setTimePoint("RsOprfSender::send-begin");
         ws = prng.get();
 
-        mPaxos.init(n, mBinSize, 3, 40, PaxosParam::GF128, oc::ZeroBlock);
+        mPaxos.init(n, mBinSize, 3, mSsp, PaxosParam::GF128, oc::ZeroBlock);
 
         mD = prng.get();
 
@@ -304,7 +304,7 @@ namespace volePSI
             throw RTE_LOC;
 
         hashingSeed = prng.get(), wr = prng.get();
-        paxos.init(values.size(), mBinSize, 3, 40, PaxosParam::GF128, hashingSeed);
+        paxos.init(values.size(), mBinSize, 3, mSsp, PaxosParam::GF128, hashingSeed);
 
         MC_AWAIT(chl.send(std::move(hashingSeed)));
 

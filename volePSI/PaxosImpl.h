@@ -767,7 +767,7 @@ namespace volePSI
 			throw RTE_LOC;
 		}
 
-		if (p.mSparseSize < numItems)
+		if (p.mSparseSize + p.mDenseSize < numItems)
 			throw RTE_LOC;
 
 		static_cast<PaxosParam&>(*this) = p;
@@ -2288,8 +2288,6 @@ namespace volePSI
 				}
 			}
 		}
-
-		//mBackingCol = std::move(backing);
 	}
 
 	template<typename IdxType>
@@ -2299,85 +2297,85 @@ namespace volePSI
 		span<std::array<IdxType, 2>> gapRows) const
 	{
 
-		FCInv ret;
-		if (gapRows.size())
+		// maps the H column indexes to F,C column Indexes
+		std::vector<IdxType> colMapping;
+		FCInv ret(gapRows.size());
+		auto m = mainRows.size();
+
+		// the input rows are in reverse order compared to the
+		// logical algorithm. This inverts the row index.
+		auto invertRowIdx = [m](auto i) { return m - i - 1; };
+
+		for (u64 i = 0; i < gapRows.size(); ++i)
 		{
-			ret.mMtx.resize(gapRows.size());
-
-			std::vector<IdxType> colInv;
-
-			for (u64 i = 0; i < gapRows.size(); ++i)
+			if (std::memcmp(
+				mRows[gapRows[i][0]].data(),
+				mRows[gapRows[i][1]].data(),
+				mWeight * sizeof(IdxType)) == 0)
 			{
-
-				if (std::memcmp(
-					mRows[gapRows[i][0]].data(),
-					mRows[gapRows[i][1]].data(),
-					mWeight * sizeof(IdxType)) == 0)
+				// special/common case where FC^-1 [i] = 0000100000
+				// where the 1 is at position gapRows[i][1]. This code is
+				// used to speed up this common case.
+				ret.mMtx[i].push_back(gapRows[i][1]);
+			}
+			else
+			{
+				// for the general case we need to implicitly create the C
+				// matrix. The issue is that currently C is defined by mainRows
+				// and mainCols and this form isn't ideal for the computation 
+				// of computing F C^-1. In particular, we will need to know which
+				// columns of the overall matrix H live in C. To do this we will construct
+				// colMapping. For columns of H that are in C, colMapping will give us
+				// the column in C. We only construct this mapping when its needed.
+				if (colMapping.size() == 0)
 				{
-					// special/common case where FC^-1 [i] = 0000100000
-					// where the 1 is at position gapRows[i][1]. This code is
-					// used to speed up this common case.
-					ret.mMtx[i].push_back(gapRows[i][1]);
+					colMapping.resize(size(), -1);
+					for (u64 i = 0; i < m; ++i)
+						colMapping[mainCols[invertRowIdx(i)]] = i;
 				}
-				else
+
+				// the current row of F. We initialize this as just F_i
+				// and then Xor in rows of C until its the zero row.
+				std::set<IdxType, std::greater<IdxType>> row;
+				for (u64 j = 0; j < mWeight; ++j)
 				{
-					// we need the invert of the column mapping for C.
-					if (colInv.size() == 0)
+					auto c1 = mRows(gapRows[i][0], j);
+					if (colMapping[c1] != IdxType(-1))
+						row.insert(colMapping[c1]);
+				}
+
+				while (row.size())
+				{
+					// the column of C, F that we will cancel (by adding
+					// the corresponding row of C to F_i. We will pick the 
+					// row of C as the row with index CCol.
+					auto CCol = *row.begin();
+
+					// the row of C we will add to F_i
+					auto CRow = CCol;
+
+					// the row of H that we will add to F_i
+					auto HRow = mainRows[invertRowIdx(CRow)];
+					ret.mMtx[i].push_back(HRow);
+
+					for (auto HCol : mRows[HRow])
 					{
-						colInv.resize(mSparseSize, -1);
-						for (u64 i = 0; i < mainRows.size(); ++i)
+						auto CCol2 = colMapping[HCol];
+						if (CCol2 != IdxType(-1))
 						{
-							colInv[mainCols[i]] = i;
+							assert(CCol2 <= CCol);
+
+							// Xor in the row CRow from C into the current
+							// row of F
+							auto iter = row.find(CCol2);
+							if (iter == row.end())
+								row.insert(CCol2);
+							else
+								row.erase(iter);
 						}
 					}
 
-					// we wil compute FC^-1 by starting with
-					// F and then iterate through thw rows of C,
-					// xoring in the row of C which is indexed 
-					// by the largest non-zero position of the 
-					// current row.
-					std::set<IdxType> colSet;
-
-					// initalize the current row as F
-					for (auto c : mRows[gapRows[i][0]])
-					{
-						auto c2 = colInv[c];
-
-						if (c2 != IdxType(-1))
-							colSet.insert(c2);
-					}
-
-					// while the current row is non-zero.
-					while (colSet.size())
-					{
-						// get the furtherest right non-zero position
-						auto iter = colSet.begin();
-						auto c2 = *iter;
-
-						// record that we are xoring in thiw row of C
-						ret.mMtx[i].push_back(mainRows.size() - c2 - 1);
-						auto r = mainRows[c2];
-						auto row = mRows[r];
-						assert(std::find(row.begin(), row.end(), mainCols[c2]) != row.end());
-
-						// xor in this row of C
-						for (auto c : row)
-						{
-							auto c3 = colInv[c];
-
-							// skip columns not part of C, ie part of A.
-							if (c3 != IdxType(-1))
-							{
-								assert(c3 >= c2);
-
-								// insert this column and check if we already
-								// had it. If so, then remove it (ie XOR)...
-								auto ii = colSet.insert(c3);
-								if (ii.second == false)
-									colSet.erase(ii.first);
-							}
-						}
-					}
+					assert(row.size() == 0 || *row.begin() != CCol);
 				}
 			}
 		}
@@ -2391,11 +2389,7 @@ namespace volePSI
 		span<std::array<IdxType, 2>> gapRows) const
 	{
 		if (gapRows.size() == 0)
-		{
 			return {};
-		}
-
-		//
 
 		auto g = gapRows.size();
 		u64 ci = 0;
@@ -2786,6 +2780,9 @@ namespace volePSI
 					auto binIdx = modNumBins(hashes[k]);
 					auto bs = binSizes[binIdx]++;
 					assert(bs < perThrdMaxBinSize);
+
+					if (inIdx == 9355778)
+						std::cout << "in " << inIdx << " -> bin " << binIdx << " @ " << bs << std::endl;
 					getInputMapping(thrdIdx, binIdx)[bs] = inIdx;
 					h.assign(getValues(thrdIdx, binIdx)[bs], vals_[inIdx]);
 					getHashes(thrdIdx, binIdx)[bs] = hashes[k];

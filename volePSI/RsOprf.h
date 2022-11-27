@@ -25,6 +25,8 @@ namespace volePSI
         bool mMalicious = false;
         block mW;
         u64 mBinSize = 1 << 14;
+        u64 mSsp = 40;
+
         void setMultType(oc::MultType type) { mVoleSender.mMultType = type; };
 
         Proto send(u64 n, PRNG& prng, Socket& chl, u64 mNumThreads = 0, bool reducedRounds = false);
@@ -48,6 +50,8 @@ namespace volePSI
         bool mMalicious = false;
         oc::SilentVoleReceiver mVoleRecver;
         u64 mBinSize = 1 << 14;
+        u64 mSsp = 40;
+
         void setMultType(oc::MultType type) { mVoleRecver.mMultType = type; };
 
         Proto receive(span<const block> values, span<block> outputs, PRNG& prng, Socket& chl, u64 mNumThreads = 0, bool reducedRounds = false);

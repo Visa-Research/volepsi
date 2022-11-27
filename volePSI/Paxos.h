@@ -76,7 +76,9 @@ namespace volePSI
 
 		// the encoding/decoding seed.
 		block mSeed;
+
 		bool mVerbose = false;
+		bool mDebug = false;
 
 		// when decoding, add the decoded value to the 
 		// output, as opposed to overwriting.
@@ -347,6 +349,9 @@ namespace volePSI
 		// A sparse representation of the F * C^-1 matrix.
 		struct FCInv
 		{
+			FCInv(u64 n)
+				: mMtx(n)
+			{}
 			std::vector<std::vector<IdxType>> mMtx;
 		};
 
