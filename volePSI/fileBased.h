@@ -1,5 +1,5 @@
 #pragma once
-// © 2022 Visa.
+// ï¿½ 2022 Visa.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 // 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
@@ -40,7 +40,7 @@ namespace volePSI
 
 	std::vector<block> readSet(const std::string& path, FileType ft, bool debug);
 
-	void writeOutput(std::string outPath, FileType ft, const std::vector<u64>& intersection);
+	void writeOutput(std::string outPath, FileType ft, const std::vector<u64>& intersection, bool indexOnly, std::string inPath);
 
 
 
