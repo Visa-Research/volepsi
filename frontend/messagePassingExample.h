@@ -132,6 +132,9 @@ void messagePassingExampleRun(oc::CLP& cmd)
     auto type = oc::MultType::slv5;
 #endif
 
+    // use fewer rounds of communication but more computation.
+    auto useReducedRounds = cmd.isSet("reducedRounds");
+
     // A buffering socket. This socket type internally buffers the 
     // protocol messages. It is then up to the user to manually send
     // and receive messages via the getOutbond(...) and processInbount(...)
@@ -150,7 +153,7 @@ void messagePassingExampleRun(oc::CLP& cmd)
             set[i] = oc::block(0, i);
 
         sender.setMultType(type);
-        sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, false);
+        sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, useReducedRounds);
 
         if (verbose)
             std::cout << "sender start\n";
@@ -173,7 +176,7 @@ void messagePassingExampleRun(oc::CLP& cmd)
 
         volePSI::RsPsiReceiver recevier;
         recevier.setMultType(type);
-        recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, false);
+        recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, useReducedRounds);
 
         if (verbose)
             std::cout << "recver start\n";
@@ -186,27 +189,144 @@ void messagePassingExampleRun(oc::CLP& cmd)
         // Perform the communication and complete the protocol.
         communicate(protocol, false, sock, verbose);
 
-        std::cout << "recver done "<< recevier.mIntersection.size() << " \n";
+        std::cout << "recver done " << recevier.mIntersection.size() << " \n";
+    }
+}
+
+// This sample is how to run both parties in  single program.
+void messagePassingExampleBoth(oc::CLP& cmd)
+{
+    // The sender set size.
+    auto ns = cmd.getOr("senderSize", 100);
+
+    // The receiver set size.
+    auto nr = cmd.getOr("receiverSize", 100);
+    auto verbose = cmd.isSet("v");
+
+    // The statistical security parameter.
+    auto ssp = cmd.getOr("ssp", 40);
+
+    // Malicious Security.
+    auto mal = cmd.isSet("malicious");
+
+    // The vole type.
+#ifdef ENABLE_BITPOLYMUL
+    auto type = cmd.isSet("useSilver") ? oc::MultType::slv5 : oc::MultType::QuasiCyclic;
+#else
+    auto type = oc::MultType::slv5;
+#endif
+
+    // use fewer rounds of communication but more computation.
+    auto useReducedRounds = cmd.isSet("reducedRounds");
+
+    // A buffering socket. This socket type internally buffers the 
+    // protocol messages. It is then up to the user to manually send
+    // and receive messages via the getOutbond(...) and processInbount(...)
+    // methods.
+    coproto::BufferingSocket senderSock, recverSock;
+
+    // Sets are always represented as 16 byte values. To support longer elements one can hash them.
+    std::vector<oc::block> senderSet, recverSet;
+    volePSI::RsPsiSender sender;
+    senderSet.resize(ns);
+
+    // in this example we use the set {0,1,...}.
+    for (oc::u64 i = 0; i < ns; ++i)
+        senderSet[i] = oc::block(0, i);
+
+    sender.setMultType(type);
+    sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, useReducedRounds);
+
+    if (verbose)
+        std::cout << "sender start\n";
+
+    // Eagerly start the protocol. This will run the protocol up to the point
+    // that it need to receive a message from the other party.
+    coproto::optional<macoro::eager_task<>> senderProto =
+        sender.run(senderSet, senderSock) | macoro::make_eager();
+
+
+    // in this example we use the set {0,1,...}.
+    recverSet.resize(nr);
+    for (oc::u64 i = 0; i < nr; ++i)
+        recverSet[i] = oc::block(0, i);
+
+    volePSI::RsPsiReceiver recevier;
+    recevier.setMultType(type);
+    recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, useReducedRounds);
+
+    if (verbose)
+        std::cout << "recver start\n";
+
+
+    // Eagerly start the protocol. This will run the protocol up to the point
+    // that it need to receive a message from the other party.
+    coproto::optional<macoro::eager_task<>> recverProto =
+        recevier.run(recverSet, recverSock) | macoro::make_eager();
+
+    // pass messages between the parties until they are done.
+    try
+    {
+        while (recverProto || senderProto)
+        {
+            if (recverProto && recverProto->is_ready())
+            {
+                // get the result of the protocol. Might throw.
+                coproto::sync_wait(*recverProto);
+                std::cout << "recver done " << recevier.mIntersection.size() << " \n";
+                recverProto.reset();
+            }
+
+            if (senderProto && senderProto->is_ready())
+            {
+                // get the result of the protocol. Might throw.
+                coproto::sync_wait(*senderProto);
+                std::cout << "sender done " << " \n";
+                senderProto.reset();
+            }
+            coproto::optional<std::vector<oc::u8>> recverMsg = recverSock.getOutbound();
+            if (recverMsg.has_value())
+                senderSock.processInbound(*recverMsg);
+
+            coproto::optional<std::vector<oc::u8>> senderMsg = senderSock.getOutbound();
+            if (senderMsg)
+                recverSock.processInbound(*senderMsg);
+        }
+
+    }
+    catch (std::exception& e)
+    {
+        std::cout << "Exception: " << e.what() << std::endl;
     }
 }
 
 
 void messagePassingExample(oc::CLP& cmd)
 {
-    // If the user specified -r, then run that party.
-    // Otherwisew run both parties.
-    if (cmd.hasValue("r"))
+    if (cmd.isSet("both"))
     {
-        messagePassingExampleRun(cmd);
+
+        messagePassingExampleBoth(cmd);
     }
     else
     {
-        auto s = cmd;
-        s.setDefault("r", 0);
-        cmd.setDefault("r", 1);
-        auto a = std::async([&]() {messagePassingExampleRun(s); });
-        messagePassingExampleRun(cmd);
-        a.get();
+
+
+        // If the user specified -r, then run that party.
+        // Otherwisew run both parties.
+        if (cmd.hasValue("r"))
+        {
+            messagePassingExampleRun(cmd);
+        }
+        else
+        {
+            auto s = cmd;
+            s.setDefault("r", 0);
+            cmd.setDefault("r", 1);
+            auto a = std::async([&]() {messagePassingExampleRun(s); });
+            messagePassingExampleRun(cmd);
+            a.get();
+        }
     }
 }
 

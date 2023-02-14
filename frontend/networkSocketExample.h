@@ -28,6 +28,10 @@ void networkSocketExampleRun(const oc::CLP& cmd)
         auto useSilver = true;
 #endif
 
+        // use fewer rounds of communication but more computation.
+        auto useReducedRounds = cmd.isSet("reducedRounds");
+
+
         std::cout << "connecting as " << (client ? "client" : "server") << " at ip " << ip << std::endl;
 
         coproto::Socket sock;
@@ -99,7 +103,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
             // configure
             volePSI::RsPsiSender sender;
             sender.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
-            sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1);
+            sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, useReducedRounds);
 
             std::cout << "sender start\n";
             auto start = std::chrono::system_clock::now();
@@ -120,7 +124,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
             // Configure.
             volePSI::RsPsiReceiver recevier;
             recevier.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
-            recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1);
+            recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, useReducedRounds);
 
             std::cout << "recver start\n";
             auto start = std::chrono::system_clock::now();

@@ -11,15 +11,15 @@ using coproto::LocalAsyncSocket;
 
 namespace
 {
-    std::vector<u64> run(PRNG& prng, std::vector<block>& recvSet, std::vector<block> &sendSet, bool mal, u64 nt = 1)
+    std::vector<u64> run(PRNG& prng, std::vector<block>& recvSet, std::vector<block> &sendSet, bool mal, u64 nt = 1, bool reduced = false)
     {
         auto sockets = LocalAsyncSocket::makePair();
 
         RsPsiReceiver recver;
         RsPsiSender sender;
 
-        recver.init(sendSet.size(), recvSet.size(), 40, prng.get(), mal, nt);
-        sender.init(sendSet.size(), recvSet.size(), 40, prng.get(), mal, nt);
+        recver.init(sendSet.size(), recvSet.size(), 40, prng.get(), mal, nt, reduced);
+        sender.init(sendSet.size(), recvSet.size(), 40, prng.get(), mal, nt, reduced);
 
         auto p0 = recver.run(recvSet, sockets[0]); 
         auto p1 = sender.run(sendSet, sockets[1]);
@@ -89,6 +89,26 @@ void Psi_Rs_full_test(const CLP& cmd)
         exp.insert(i);
 
     auto inter = run(prng, recvSet, sendSet, false);
+    std::set<u64> act(inter.begin(), inter.end());
+    if (act != exp)
+        throw RTE_LOC;
+}
+
+
+
+void Psi_Rs_reduced_test(const CLP& cmd)
+{
+    u64 n = cmd.getOr("n", 13243);
+    std::vector<block> recvSet(n), sendSet(n);
+    PRNG prng(ZeroBlock);
+    prng.get(recvSet.data(), recvSet.size());
+    sendSet = recvSet;
+
+    std::set<u64> exp;
+    for (u64 i = 0; i < n; ++i)
+        exp.insert(i);
+
+    auto inter = run(prng, recvSet, sendSet, false, 1, true);
     std::set<u64> act(inter.begin(), inter.end());
     if (act != exp)
         throw RTE_LOC;

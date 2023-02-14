@@ -4,7 +4,7 @@ namespace volePSI
 {
     Proto RsOprfSender::send(u64 n, PRNG& prng, Socket& chl, u64 numThreads, bool reducedRounds)
     {
-        MC_BEGIN(Proto,this, n, &prng, &chl, numThreads, reducedRounds,
+        MC_BEGIN(Proto, this, n, &prng, &chl, numThreads, reducedRounds,
             ws = block{},
             hBuff = std::array<u8, 32> {},
             ro = oc::RandomOracle(32),
@@ -253,17 +253,9 @@ namespace volePSI
     Proto RsOprfSender::genVole(PRNG& prng, Socket& chl, bool reduceRounds)
     {
         if (reduceRounds)
-        {
-            MC_BEGIN(Proto, this, &prng, &chl);
             mVoleSender.configure(mPaxos.size(), oc::SilentBaseType::Base);
-            MC_AWAIT(mVoleSender.genSilentBaseOts(prng, chl));
-            MC_AWAIT(mVoleSender.silentSendInplace(mD, mPaxos.size(), prng, chl));
-            MC_END();
-        }
-        else
-        {
-            return mVoleSender.silentSendInplace(mD, mPaxos.size(), prng, chl);
-        }
+
+        return mVoleSender.silentSendInplace(mD, mPaxos.size(), prng, chl);
     }
 
     struct UninitVec : span<block>
@@ -280,7 +272,7 @@ namespace volePSI
     Proto RsOprfReceiver::receive(span<const block> values, span<block> outputs, PRNG& prng, Socket& chl, u64 numThreads, bool reducedRounds)
     {
 
-        MC_BEGIN(Proto,this, values, outputs, &prng, &chl, numThreads, reducedRounds,
+        MC_BEGIN(Proto, this, values, outputs, &prng, &chl, numThreads, reducedRounds,
             hashingSeed = block{},
             wr = block{},
             ws = block{},
@@ -508,17 +500,8 @@ namespace volePSI
     Proto RsOprfReceiver::genVole(u64 n, PRNG& prng, Socket& chl, bool reducedRounds)
     {
         if (reducedRounds)
-        {
-            MC_BEGIN(Proto, this, n, &prng, &chl);
             mVoleRecver.configure(n, oc::SilentBaseType::Base);
-            MC_AWAIT(mVoleRecver.genSilentBaseOts(prng, chl));
-            MC_AWAIT(mVoleRecver.silentReceiveInplace(n, prng, chl));
-            MC_END();
-        }
-        else
-        {
-            return mVoleRecver.silentReceiveInplace(n, prng, chl);
-        }
+        return mVoleRecver.silentReceiveInplace(n, prng, chl);
     }
 
 }

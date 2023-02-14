@@ -55,6 +55,7 @@ namespace volePSI_Tests
 
         t.add("RsOprf_eval_test            ", RsOprf_eval_test);
         t.add("RsOprf_mal_test             ", RsOprf_mal_test);
+        t.add("RsOprf_reduced_test         ", RsOprf_reduced_test);
                    
 #ifdef VOLE_PSI_ENABLE_OPPRF
         t.add("RsOpprf_eval_blk_test       ", RsOpprf_eval_blk_test);
@@ -67,6 +68,7 @@ namespace volePSI_Tests
         t.add("Psi_Rs_empty_test           ", Psi_Rs_empty_test);
         t.add("Psi_Rs_partial_test         ", Psi_Rs_partial_test);
         t.add("Psi_Rs_full_test            ", Psi_Rs_full_test);
+        t.add("Psi_Rs_reduced_test         ", Psi_Rs_reduced_test);
         t.add("Psi_Rs_multiThrd_test       ", Psi_Rs_multiThrd_test);
         t.add("Psi_Rs_mal_test             ", Psi_Rs_mal_test);
                                            

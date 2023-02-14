@@ -28,9 +28,6 @@ namespace volePSI
         u64 numThreads, 
         bool useReducedRounds)
     {
-        if (useReducedRounds)
-            throw std::runtime_error("useReducedRounds not implemented. " LOCATION);
-
         mSenderSize = senderSize;
         mRecverSize = recverSize;
         mSsp = statSecParam;
