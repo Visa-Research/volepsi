@@ -35,13 +35,14 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
                        -DENABLE_MRR=ON
                        -DENABLE_IKNP=ON
                        -DENABLE_SOFTSPOKEN_OT=ON
-                       -DENABLE_BITPOLYMUL=${LIBOTE_ENABLE_BITPOLYMUL}
+                       -DENABLE_BITPOLYMUL=${VOLE_PSI_ENABLE_BITPOLYMUL}
                        -DENABLE_SILENTOT=ON
                        -DENABLE_SILENT_VOLE=ON
                        ${LIBOTE_OS_ARGS}
                        -DENABLE_SSE=${VOLE_PSI_ENABLE_SSE}
-                       -DCOPROTO_ENABLE_BOOST=${COPROTO_ENABLE_BOOST}
-                       -DCOPROTO_ENABLE_OPENSSL=${COPROTO_ENABLE_OPENSSL}
+                       -DENABLE_BOOST=${VOLE_PSI_ENABLE_BOOST}
+                       -DENABLE_OPENSSL=${VOLE_PSI_ENABLE_OPENSSL}
+                       -DLIBOTE_STD_VER=${VOLE_PSI_STD_VER}
                        -DOC_PIC=${VOLE_PSI_PIC}
                        -DOC_THIRDPARTY_CLONE_DIR=${VOLE_PSI_THIRDPARTY_CLONE_DIR}
                        )

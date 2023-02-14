@@ -8,7 +8,6 @@ set(LOG_FILE  "${CMAKE_CURRENT_LIST_DIR}/log-${DEP_NAME}.txt")
 
 
 include("${CMAKE_CURRENT_LIST_DIR}/fetch.cmake")
-
 if(NOT LIBDIVIDE_FOUND)
     find_program(GIT git REQUIRED)
     set(DOWNLOAD_CMD  ${GIT} clone ${GIT_REPOSITORY})
@@ -23,7 +22,7 @@ if(NOT LIBDIVIDE_FOUND)
     endif()
 
     run(NAME "Checkout ${GIT_TAG} " CMD ${CHECKOUT_CMD}  WD ${CLONE_DIR})
-    message("Install")
+    message("Install: cp ${CLONE_DIR}/libdivide.h  ${VOLEPSI_THIRDPARTY_DIR}/include/")
     file(COPY ${CLONE_DIR}/libdivide.h DESTINATION ${VOLEPSI_THIRDPARTY_DIR}/include/)
     message("log ${LOG_FILE}\n==========================================")
 else()

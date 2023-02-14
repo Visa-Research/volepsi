@@ -304,6 +304,7 @@ namespace volePSI
             throw RTE_LOC;
 
         hashingSeed = prng.get(), wr = prng.get();
+        paxos.mDebug = mDebug;
         paxos.init(values.size(), mBinSize, 3, mSsp, PaxosParam::GF128, hashingSeed);
 
         MC_AWAIT(chl.send(std::move(hashingSeed)));

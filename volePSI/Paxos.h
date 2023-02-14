@@ -144,6 +144,9 @@ namespace volePSI
 		{
 			setInput(inputs);
 			encode<ValueType>(values, output, prng);
+
+			if(mDebug)
+				check(inputs, values, output);
 		}
 
 		// set the input keys which define the paxos matrix. After that,
@@ -386,6 +389,31 @@ namespace volePSI
 		template<typename Vec, typename Helper>
 		void randomizeDenseCols(Vec&, Helper&, span<u64> gapCols, oc::PRNG* prng);
 
+
+
+		template<typename ValueType>
+		void check(span<const block> inputs, MatrixView<const ValueType> values, MatrixView<const ValueType> output)
+		{
+			oc::Matrix<ValueType> v2(values.rows(), values.cols());
+			decode<ValueType>(inputs, v2, output);
+
+			for (u64 i = 0; i < values.rows(); ++i)
+			{
+				for(u64 j =0; j < values.cols(); ++j)
+					if (v2(i, j) != values(i, j))
+					{
+						std::cout << "paxos failed to encode. \n"
+							<< "inputs["<< i << "]" << inputs[i] << "\n"
+							<< "seed " << mSeed  <<"\n"
+							<< "n " << size() << "\n"
+							<< "m " << inputs.size() << "\n"
+							<< std::endl;
+						throw RTE_LOC;
+					}
+			}
+		}
+
+
 	};
 
 	// a binned version of paxos. Internally calls paxos.
@@ -397,6 +425,8 @@ namespace volePSI
 		// the parameters used on a single bim.
 		PaxosParam mPaxosParam;
 		block mSeed;
+
+		bool mDebug = false;
 
 		// when decoding, add the decoded value to the 
 		// output, as opposed to overwriting.
@@ -546,6 +576,29 @@ namespace volePSI
 		u64 modNumBins(const block& h)
 		{
 			return binIdxCompress(h) % mNumBins;
+		}
+
+
+		template<typename Vec, typename Vec2>
+		void check(span<const block> inputs, Vec values, Vec2 output)
+		{
+			auto h = values.defaultHelper();
+			auto v2 = h.newVec(values.size());
+			decode(inputs, v2, output, h, 1);
+
+			for (u64 i = 0; i < values.size(); ++i)
+			{
+				if (h.eq(v2[i],values[i]) == false)
+				{
+					std::cout << "paxos failed to encode. \n"
+						<< "inputs[" << i << "]" << inputs[i] << "\n"
+						<< "seed " << mSeed << "\n"
+						<< "n " << size() << "\n"
+						<< "m " << inputs.size() << "\n"
+						<< std::endl;
+					throw RTE_LOC;
+				}
+			}
 		}
 
 	};

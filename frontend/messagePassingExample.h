@@ -186,7 +186,7 @@ void messagePassingExampleRun(oc::CLP& cmd)
         // Perform the communication and complete the protocol.
         communicate(protocol, false, sock, verbose);
 
-        std::cout << "recver done\n";
+        std::cout << "recver done "<< recevier.mIntersection.size() << "\n";
     }
 }
 

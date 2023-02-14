@@ -580,26 +580,29 @@ void Baxos_solve_Test(const oc::CLP& cmd)
 	u64 s = cmd.getOr("s", 0);
 	//u64 v = cmd.getOr("v", cmd.isSet("v") ? 1 : 0);
 	u64 t = cmd.getOr("t", 1);
+	bool v = cmd.isSet("v");
 	//u64 g = cmd.getOr("g", 3);
 
 	//for (u64 n = 10; n < nn; ++n)
 	{
+		PRNG prng(block(0, s));
+		Baxos paxos;
+		paxos.init(n, b, w, 40, PaxosParam::GF128, prng.get<block>());
 
+		std::vector<block> items(n), values(n), values2(n), p(paxos.size());
+		prng.get(items.data(), items.size());
+		prng.get(values.data(), values.size());
 
 		for (u64 tt = 0; tt < t; ++tt)
 		{
-			Baxos paxos;
-			paxos.init(n, b, w, 40, PaxosParam::Binary, ZeroBlock);
-			std::vector<block> items(n), values(n), values2(n), p(paxos.size());
 			PRNG prng(block(tt, s));
-			prng.get(items.data(), items.size());
-			prng.get(values.data(), values.size());
+			paxos.init(n, b, w, 40, PaxosParam::GF128, prng.get<block>());
 
 			paxos.solve<block>(items, values, p);
-
-
 			paxos.decode<block>(items, values2, p);
 
+			if (v)
+				std::cout << "." << std::flush;
 			if (values2 != values)
 			{
 				u64 count = 0;
@@ -619,6 +622,8 @@ void Baxos_solve_Test(const oc::CLP& cmd)
 						++count;
 					}
 				}
+
+				std::cout << "seed " << prng.getSeed() << " "<<tt << std::endl;
 				throw RTE_LOC;
 			}
 		}
