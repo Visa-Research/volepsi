@@ -99,7 +99,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
             // configure
             volePSI::RsPsiSender sender;
             sender.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
-            sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, true);
+            sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1);
 
             std::cout << "sender start\n";
             auto start = std::chrono::system_clock::now();
@@ -120,7 +120,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
             // Configure.
             volePSI::RsPsiReceiver recevier;
             recevier.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
-            recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, true);
+            recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1);
 
             std::cout << "recver start\n";
             auto start = std::chrono::system_clock::now();

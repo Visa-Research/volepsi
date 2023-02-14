@@ -97,7 +97,7 @@ auto communicate(
     };
 
     // The sender we generate the first message.
-    if (!sender)
+    if (sender)
         write();
 
     // While the protocol is not done we alternate between reading and writing messages.
@@ -150,7 +150,7 @@ void messagePassingExampleRun(oc::CLP& cmd)
             set[i] = oc::block(0, i);
 
         sender.setMultType(type);
-        sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, true);
+        sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, false);
 
         if (verbose)
             std::cout << "sender start\n";
@@ -167,13 +167,13 @@ void messagePassingExampleRun(oc::CLP& cmd)
     else
     {
         // in this example we use the set {0,1,...}.
-        set.resize(ns);
-        for (oc::u64 i = 0; i < ns; ++i)
+        set.resize(nr);
+        for (oc::u64 i = 0; i < nr; ++i)
             set[i] = oc::block(0, i);
 
         volePSI::RsPsiReceiver recevier;
         recevier.setMultType(type);
-        recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, true);
+        recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, false);
 
         if (verbose)
             std::cout << "recver start\n";
@@ -186,7 +186,7 @@ void messagePassingExampleRun(oc::CLP& cmd)
         // Perform the communication and complete the protocol.
         communicate(protocol, false, sock, verbose);
 
-        std::cout << "recver done\n";
+        std::cout << "recver done "<< recevier.mIntersection.size() << " \n";
     }
 }
 
