@@ -40,12 +40,6 @@ namespace volePSI
 
 	std::vector<block> readSet(const std::string& path, FileType ft, bool debug);
 
-	void writeOutput(std::string outPath, FileType ft, const std::vector<u64>& intersection);
-
-
-
-	void padSmallSet(std::vector<block>& set, u64& theirSize, const oc::CLP& cmd);
-
 	void doFilePSI(const oc::CLP& cmd);
 
 
