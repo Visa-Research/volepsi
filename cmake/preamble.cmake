@@ -70,20 +70,23 @@ else()
 	set(VOLEPSI_IN_BUILD_TREE OFF)
 endif()
 
+# we are in the build tree. We might be building the library or 
+# someone is consuming us from the build tree.
 if(VOLEPSI_IN_BUILD_TREE)
 
+	set(VOLEPSI_BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/../out/build/${VOLEPSI_CONFIG}")
+	get_filename_component(VOLEPSI_BUILD_DIR ${VOLEPSI_BUILD_DIR} ABSOLUTE)
+
+	# true if we are actually building
 	if(VOLEPSI_BUILD)
+		# warn if we aren't using out/build/<config>/
+		if(NOT (${CMAKE_BINARY_DIR} STREQUAL ${VOLEPSI_BUILD_DIR}))
+			message(WARNING "unexpected build directory. \n\tCMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}\nbut expect\n\tVOLEPSI_BUILD_DIR=${VOLEPSI_BUILD_DIR}")
+		endif()
 		set(VOLEPSI_BUILD_DIR ${CMAKE_BINARY_DIR})
-	endif()
-    # we currenty are in the vole psi source tree, vole-psi/cmake
-	if(NOT DEFINED VOLEPSI_BUILD_DIR)
-		set(VOLEPSI_BUILD_DIR "${CMAKE_CURRENT_LIST_DIR}/../out/build/${VOLEPSI_CONFIG}")
-		get_filename_component(VOLEPSI_BUILD_DIR ${VOLEPSI_BUILD_DIR} ABSOLUTE)
+	else()
 	endif()
 
-	if(NOT (${CMAKE_BINARY_DIR} STREQUAL ${VOLEPSI_BUILD_DIR}))
-		message(WARNING "incorrect build directory. \n\tCMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}\nbut expect\n\tVOLEPSI_BUILD_DIR=${VOLEPSI_BUILD_DIR}")
-	endif()
 
 	if(NOT DEFINED VOLEPSI_THIRDPARTY_DIR)
 		set(VOLEPSI_THIRDPARTY_DIR "${CMAKE_CURRENT_LIST_DIR}/../out/install/${VOLEPSI_CONFIG}")
