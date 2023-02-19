@@ -10,7 +10,7 @@ find_package(volePSI REQUIRED HINTS ${VOLEPSI_HINT})
 add_executable(main "main.cpp")
 
 if(MSVC)
-    set_target_properties(volePSI
+    set_target_properties(main
         PROPERTIES
             CXX_STANDARD ${VOLE_PSI_STD_VER}
             CXX_STANDARD_REQUIRED YES

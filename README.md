@@ -63,11 +63,11 @@ To ensure that cmake can find volepsi, you can either install volepsi or build i
 To link a non-cmake project you will need to link volepsi, libOTe,coproto, macoro, (sodium or relic), optionally boost and openss if enabled. These will be installed to the install location and staged to `./out/install/<platform>`. 
 
 
-### Dependancy Managment
+### Dependency Management
 
 By default the dependencies are fetched automatically. This can be turned off by using cmake directly or adding `-D FETCH_AUTO=OFF`. For other options see the cmake output or that of `python build.py --help`.
 
-If the dependency is installed to the system, then cmake should automatically find it. If they are installed to a specific location, then you call tell cmake about them as 
+If the dependency is installed to the system, then cmake should automatically find it if `VOLE_PSI_NO_SYSTEM_PATH` is `false`. If they are installed to a specific location, then you call tell cmake about them as 
 ```
 python3 build.py -D CMAKE_PREFIX_PATH=install/prefix/path
 ```
