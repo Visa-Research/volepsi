@@ -33,8 +33,8 @@ add_library(volePSI STATIC ${SRCS})
 target_link_libraries(volePSI oc::libOTe sparsehash libdivide)
 
 if(APPLE)
-    target_compile_options(volePSI PUBLIC
-        "-std=c++${VOLE_PSI_CPP_VER}"
+    target_compile_options(volePSI PRIVATE
+        "-std=c++${VOLE_PSI_STD_VER}"
     )    
     target_compile_options(volePSI PRIVATE
         "-Wno-pessimizing-move"
@@ -43,7 +43,7 @@ if(APPLE)
 elseif(MSVC)
     set_target_properties(volePSI
         PROPERTIES
-            CXX_STANDARD ${VOLE_PSI_CPP_VER}
+            CXX_STANDARD ${VOLE_PSI_STD_VER}
             CXX_STANDARD_REQUIRED YES
             CXX_EXTENSIONS NO
     )
@@ -56,7 +56,7 @@ elseif(MSVC)
     endif()
 else()
     target_compile_options(volePSI PUBLIC
-        "-std=c++${VOLE_PSI_CPP_VER}"
+        "-std=c++${VOLE_PSI_STD_VER}"
     )    
 
     if(VOLE_PSI_ENABLE_ASAN)

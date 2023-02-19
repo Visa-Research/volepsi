@@ -606,6 +606,12 @@ namespace volePSI
 			{
 				prng.get(p, 1);
 			}
+
+
+			inline static auto eq(iterator p0, iterator p1)
+			{
+				return *p0 == *p1;
+			}
 		};
 
 		// return the default helper for this vector type.
@@ -770,6 +776,13 @@ namespace volePSI
 			inline void randomize(mut_iterator p, oc::PRNG& prng)
 			{
 				prng.get(p, mCols);
+			}
+
+
+
+			inline auto eq(iterator p0, iterator p1)
+			{
+				return memcmp(p0, p1, sizeof(value_type) * mCols) == 0;
 			}
 		};
 

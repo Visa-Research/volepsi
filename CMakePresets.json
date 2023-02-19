@@ -1,97 +1,87 @@
 {
     "version": 2,
-    "configurePresets": [
-        {
-            "name": "linux",
-            "displayName": "Linux",
-            "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "VOLE_PSI_ENABLE_ASAN": false,
-                "FETCH_AUTO": "ON",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": [
-                        "Linux"
-                    ]
-                },
-                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": {
-                    "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}"
-                }
-            }
-        },
-        {
-            "name": "x64-Debug",
-            "displayName": "Windows x64 Debug",
-            "description": "Target Windows with the Visual Studio development environment.",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "FETCH_AUTO": "ON",
-                "VOLE_PSI_ENABLE_ASAN": false,
-                "COPROTO_ENABLE_BOOST": true,
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": [
-                        "Windows"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "x64-Release",
-            "displayName": "Windows x64 Release",
-            "description": "Target Windows with the Visual Studio development environment.",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "architecture": {
-                "value": "x64",
-                "strategy": "external"
-            },
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-                "FETCH_AUTO": "ON",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": [
-                        "Windows"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "osx",
-            "displayName": "preset for macOS",
-            "description": "Sets Ninja generator, build and install directory",
-            "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/out/build/${presetName}",
-            "cacheVariables": {
-                "FETCH_AUTO": true,
-                "VOLE_PSI_PIC": true,
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_PREFIX_PATH": "/usr/local/opt/openssl/",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-            },
-            "vendor": {
-                "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": [
-                        "macOS"
-                    ]
-                }
-            }
-        }
-    ]
+  "configurePresets": [
+
+    {
+      "name": "linux",
+      "displayName": "Linux",
+      "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "FETCH_AUTO": true,
+        "FETCH_SPARSEHASH": true,
+        "FETCH_LIBDIVIDE": true,
+        "VOLE_PSI_ENABLE_ASAN": true,
+        "VOLE_PSI_ENABLE_BOOST": true,
+        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
+        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" }
+      }
+    },
+    {
+      "name": "x64-Debug",
+      "displayName": "Windows x64 Debug",
+      "description": "Target Windows with the Visual Studio development environment.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "FETCH_AUTO": true,
+        "FETCH_SPARSEHASH": true,
+        "VOLE_PSI_ENABLE_ASAN": true,
+        "COPROTO_ENABLE_BOOST": true,
+        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      },
+      "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
+    },
+    {
+      "name": "x64-Release",
+      "displayName": "Windows x64 Release",
+      "description": "Target Windows with the Visual Studio development environment.",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "FETCH_AUTO": true,
+        "VOLE_PSI_ENABLE_BOOST": true,
+        "VOLE_PSI_ENABLE_BITPOLYMUL": false,
+        "FETCH_LIBOTE": true,
+        "FETCH_LIBDIVIDE": true,
+        "FETCH_SPARSEHASH": true,
+        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      },
+      "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
+    },
+    {
+      "name": "osx",
+      "displayName": "Custom configure preset",
+      "description": "Sets Ninja generator, build and install directory",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "cacheVariables": {
+        "FETCH_AUTO": true,
+        "VOLE_PSI_PIC": true,
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_PREFIX_PATH": "/usr/local/opt/openssl/",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
+      },
+      "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "osx" ] } }
+
+    }
+  ]
 }

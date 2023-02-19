@@ -26,6 +26,7 @@ namespace volePSI
         block mW;
         u64 mBinSize = 1 << 14;
         u64 mSsp = 40;
+        bool mDebug = false;
 
         void setMultType(oc::MultType type) { mVoleSender.mMultType = type; };
 
@@ -51,6 +52,7 @@ namespace volePSI
         oc::SilentVoleReceiver mVoleRecver;
         u64 mBinSize = 1 << 14;
         u64 mSsp = 40;
+        bool mDebug = false;
 
         void setMultType(oc::MultType type) { mVoleRecver.mMultType = type; };
 

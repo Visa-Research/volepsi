@@ -113,10 +113,10 @@ void messagePassingExampleRun(oc::CLP& cmd)
     auto receiver = cmd.get<int>("r");
 
     // The sender set size.
-    auto ns = cmd.getOr("senderSize", 100);
+    auto ns = cmd.getOr("senderSize", 100ull);
 
     // The receiver set size.
-    auto nr = cmd.getOr("receiverSize", 100);
+    auto nr = cmd.getOr("receiverSize", 100ull);
     auto verbose = cmd.isSet("v");
 
     // The statistical security parameter.

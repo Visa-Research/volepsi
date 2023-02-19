@@ -56,6 +56,8 @@ namespace volePSI
 
         mSender.mMalicious = mMalicious;
         mSender.mSsp = mSsp;
+        mSender.mDebug = mDebug;
+
         MC_AWAIT(mSender.send(mRecverSize, mPrng, chl, mNumThreads, mUseReducedRounds));
 
         setTimePoint("RsPsiSender::run-opprf");
@@ -151,6 +153,7 @@ namespace volePSI
 
         mRecver.mMalicious = mMalicious;
         mRecver.mSsp = mSsp;
+        mRecver.mDebug = mDebug;
 
         // todo, parallelize these two
         MC_AWAIT(mRecver.receive(inputs, myHashes, mPrng, chl, mNumThreads, mUseReducedRounds));

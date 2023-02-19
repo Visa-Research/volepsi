@@ -2,7 +2,7 @@
 set(USER_NAME           )      
 set(TOKEN               )      
 set(GIT_REPOSITORY      "https://github.com/osu-crypto/libOTe.git")
-set(GIT_TAG             "3d1ecb211a2421a670f787131ea1fb2d477ff128" )
+set(GIT_TAG             "9c4db3054271752dc32c8709e9580920b8877a82" )
 
 set(DEP_NAME            libOTe)          
 set(CLONE_DIR "${VOLE_PSI_THIRDPARTY_CLONE_DIR}/${DEP_NAME}")
@@ -15,11 +15,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/fetch.cmake")
 option(LIBOTE_DEV "always build libOTe" OFF)
 
 if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
-    if(APPLE)
-        set(LIBOTE_OS_ARGS -DENABLE_RELIC=ON )
-    else()
-        set(LIBOTE_OS_ARGS -DENABLE_SODIUM=ON -DENABLE_MRR_TWIST=ON)
-    endif()
+
     string (REPLACE ";" "%" CMAKE_PREFIX_PATH_STR "${CMAKE_PREFIX_PATH}")
 
     find_program(GIT git REQUIRED)
@@ -28,6 +24,7 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
     set(SUBMODULE_CMD   ${GIT} submodule update --recursive)
     set(CONFIGURE_CMD ${CMAKE_COMMAND} -S ${CLONE_DIR} -B ${BUILD_DIR} -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
                        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH_STR}
+                       -DNO_SYSTEM_PATH=${VOLE_PSI_NO_SYSTEM_PATH}
                        -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE} 
                        -DFETCH_AUTO=${FETCH_AUTO}
                        -DVERBOSE_FETCH=${VERBOSE_FETCH}
@@ -35,15 +32,19 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
                        -DENABLE_MRR=ON
                        -DENABLE_IKNP=ON
                        -DENABLE_SOFTSPOKEN_OT=ON
-                       -DENABLE_BITPOLYMUL=${LIBOTE_ENABLE_BITPOLYMUL}
+                       -DENABLE_BITPOLYMUL=${VOLE_PSI_ENABLE_BITPOLYMUL}
                        -DENABLE_SILENTOT=ON
                        -DENABLE_SILENT_VOLE=ON
-                       ${LIBOTE_OS_ARGS}
                        -DENABLE_SSE=${VOLE_PSI_ENABLE_SSE}
-                       -DCOPROTO_ENABLE_BOOST=${COPROTO_ENABLE_BOOST}
-                       -DCOPROTO_ENABLE_OPENSSL=${COPROTO_ENABLE_OPENSSL}
+                       -DENABLE_BOOST=${VOLE_PSI_ENABLE_BOOST}
+                       -DENABLE_OPENSSL=${VOLE_PSI_ENABLE_OPENSSL}
+                       -DLIBOTE_STD_VER=${VOLE_PSI_STD_VER}
                        -DOC_PIC=${VOLE_PSI_PIC}
                        -DOC_THIRDPARTY_CLONE_DIR=${VOLE_PSI_THIRDPARTY_CLONE_DIR}
+                       -DOC_THIRDPARTY_INSTALL_PREFIX=${VOLEPSI_THIRDPARTY_DIR}
+                       -DENABLE_SODIUM=${VOLE_PSI_ENABLE_SODIUM}
+                       -DENABLE_RELIC=${VOLE_PSI_ENABLE_RELIC}
+                       -DSODIUM_MONTGOMERY=${VOLE_PSI_SODIUM_MONTGOMERY}
                        )
     set(BUILD_CMD     ${CMAKE_COMMAND} --build ${BUILD_DIR} --config ${CMAKE_BUILD_TYPE})
     set(INSTALL_CMD   ${CMAKE_COMMAND} --install ${BUILD_DIR} --config ${CMAKE_BUILD_TYPE} --prefix ${VOLEPSI_THIRDPARTY_DIR})

@@ -2624,6 +2624,10 @@ namespace volePSI
 			implParSolve<u32>(inputs, V, P, prng, numThreads, h);
 		else
 			implParSolve<u64>(inputs, V, P, prng, numThreads, h);
+
+
+		if (mDebug)
+			this->check(inputs, V, P);
 	}
 
 	template<typename IdxType, typename Vec, typename ConstVec, typename Helper>

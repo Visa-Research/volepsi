@@ -28,6 +28,7 @@ namespace volePSI
             u64 mNumThreads = 0;
             u64 mMaskSize = 0;
             bool mUseReducedRounds = false;
+            bool mDebug = false;
 
             void init(u64 senderSize, u64 recverSize, u64 statSecParam, block seed, bool malicious, u64 numThreads, bool useReducedRounds = false);
 

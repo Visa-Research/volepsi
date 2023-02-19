@@ -1,11 +1,4 @@
 
-option(VERBOSE_FETCH "verbose fetch" OFF)
-
-if(DEFINED LOG_FILE AND NOT VERBOSE_FETCH)
-    set(LOG_SETTING OUTPUT_FILE ${LOG_FILE} ERROR_FILE ${LOG_FILE} ${OUTPUT_QUIET})
-else()
-    unset(LOG_SETTING)
-endif()
 
 function(RUN)
     cmake_parse_arguments(
@@ -16,12 +9,6 @@ function(RUN)
         ${ARGN} # arguments of the function to parse, here we take the all original ones
     )
     message("${PARSED_ARGS_NAME}")
-    file(APPEND ${LOG_FILE}
-        "vvvvvvvvvvvvv RUN ${PARSED_ARGS_NAME} vvvvvvvvvvvv\n"
-        "${PARSED_ARGS_CMD}\n"
-        "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n"
-    )
-
 
     string (REPLACE "%" "\;" PARSED_ARGS_CMD_STR "${PARSED_ARGS_CMD}")
 
@@ -30,13 +17,11 @@ function(RUN)
         WORKING_DIRECTORY ${PARSED_ARGS_WD}
         RESULT_VARIABLE RESULT
         COMMAND_ECHO STDOUT
-        ${LOG_SETTING}
     )
     if(RESULT)
-        if(NOT VERBOSE_FETCH)
             file(READ ${LOG_FILE} LOG_STRING)
-            message(FATAL_ERROR "${PARSED_ARGS_NAME} failed (${RESULT}).\nLOG:\n" ${LOG_STRING})
-        endif()
+            message(FATAL_ERROR "${PARSED_ARGS_NAME} failed (${RESULT}).")
+
     endif()
 endfunction()
 

@@ -102,13 +102,13 @@ def Build(projectName, argv, install, par, sudo, noConfig):
 def help():
 
     print(" --install \n\tInstructs the script to install whatever is currently being built to the default location.")
-    print(" --install=prefix  \n\tinstall to the provided predix.")
+    print(" --install=prefix  \n\tinstall to the provided prefix.")
     print(" --sudo  \n\twhen installing, use sudo. May require password.")
     print(" --par=n  \n\twhen building do use parallel  builds with n threads. default = num cores.")
-    print(" --noauto  \n\twhen building do not automaticly fetch dependancies.")
+    print(" --noauto  \n\twhen building do not automatically fetch dependencies.")
     print(" --par=n  \n\twhen building do use parallel  builds with n threads. default = num cores.")
     print(" --debug  \n\tdebug build.")
-    print("any additioanl arguments are forwared to cmake.\n")
+    print("any additional arguments are forward to cmake.\n")
 
     print("-build the library")
     print("     python build.py")
@@ -155,17 +155,18 @@ def main(projectName, argv):
 
 
     if "--clean" in argv:
-        rm("out/")
-        rm("thirdparty/libOTe")
-        rm("thirdparty/libdivide")
-        rm("thirdparty/sparsehash-c11")
-        argv = replace(argv, "--clean", "")
-
-    if any("LIBOTE" in arg for arg in argv):
+        rm("out/build")
         rm("out/install")
-    if any("COPROTO" in arg for arg in argv):
-        rm("out/install")
-        rm("thirdparty/libOTe/out/install")
+        rm("out/bitpolymul/out")
+        rm("out/coproto/out")
+        rm("out/function2/out")
+        rm("out/libsodium/Build")
+        rm("out/macoro/out")
+        rm("out/libOTe/out")
+        rm("out/optional-lite/out")
+        rm("out/span-lite/out")
+        rm("out/variant-lite/out")
+        return
 
     sudo = "--sudo" in argv;
     if not sudo:
@@ -176,6 +177,13 @@ def main(projectName, argv):
         argv.append("-DFETCH_AUTO=OFF")
     else:
         argv.append("-DFETCH_AUTO=ON")
+
+    
+    if "--system" in argv:
+        argv = replace(argv, "--system", "")
+        argv.append("-DVOLE_PSI_NO_SYSTEM_PATH=false")
+    else:
+        argv.append("-DVOLE_PSI_NO_SYSTEM_PATH=true")
 
     argv = replace(argv, "--sudo", "-DSUDO_FETCH=ON")
         
