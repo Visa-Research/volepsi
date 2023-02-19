@@ -16,6 +16,8 @@ macro(FIND_SPARSEHASH)
     #explicitly asked to fetch sparsehash
     if(FETCH_SPARSEHASH)
         list(APPEND ARGS NO_DEFAULT_PATH PATHS ${VOLEPSI_THIRDPARTY_DIR})
+    elseif(${NO_CMAKE_SYSTEM_PATH})
+        list(APPEND ARGS NO_CMAKE_SYSTEM_PATH)
     endif()
     
     find_path(SPARSEHASH_INCLUDE_DIRS "sparsehash/dense_hash_map" PATH_SUFFIXES "include" ${ARGS})
@@ -52,6 +54,8 @@ macro(FIND_LIBOTE)
     #explicitly asked to fetch libOTe
     if(FETCH_LIBOTE)
         list(APPEND ARGS NO_DEFAULT_PATH PATHS ${VOLEPSI_THIRDPARTY_DIR})
+    elseif(${VOLE_PSI_NO_SYSTEM_PATH})
+        list(APPEND ARGS NO_CMAKE_SYSTEM_PATH)
     endif()
     
     set(libOTe_options silentot silent_vole circuits)
@@ -72,6 +76,24 @@ macro(FIND_LIBOTE)
         set(libOTe_options ${libOTe_options} bitpolymul)
     endif()
 
+    if(VOLE_PSI_PIC)
+        set(libOTe_options ${libOTe_options} pic)
+    else()
+        set(libOTe_options ${libOTe_options} no_pic)
+    endif()
+    
+    if(VOLE_PSI_ENABLE_SODIUM)
+        set(libOTe_options ${libOTe_options} sodium)
+        if(VOLE_PSI_SODIUM_MONTGOMERY)
+            set(libOTe_options ${libOTe_options} sodium_montgomery)
+        else()
+            set(libOTe_options ${libOTe_options} no_sodium_montgomery)
+        endif()
+    endif()
+        
+    if(VOLE_PSI_ENABLE_RELIC)
+        set(libOTe_options ${libOTe_options} relic)
+    endif()
 
     find_package(libOTe ${ARGS} COMPONENTS  ${libOTe_options})
 
@@ -100,6 +122,8 @@ macro(FIND_LIBDIVIDE)
     #explicitly asked to fetch libdivide
     if(FETCH_LIBDIVIDE)
         list(APPEND ARGS NO_DEFAULT_PATH PATHS ${VOLEPSI_THIRDPARTY_DIR})
+    elseif(${VOLE_PSI_NO_SYSTEM_PATH})
+        list(APPEND ARGS NO_CMAKE_SYSTEM_PATH)
     endif()
 
 

@@ -10,34 +10,13 @@
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "FETCH_AUTO": false,
+        "FETCH_AUTO": true,
         "FETCH_SPARSEHASH": true,
         "FETCH_LIBDIVIDE": true,
-
         "VOLE_PSI_ENABLE_ASAN": true,
-        "CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
+        "VOLE_PSI_ENABLE_BOOST": true,
+        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
-        "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "sourceDir": "$env{HOME}/.vs/$ms{projectDirName}" }
-      }
-    },
-
-    {
-      "name": "wsllinux",
-      "displayName": "wsllinux",
-      "description": "Target the Windows Subsystem for Linux (WSL) or a remote Linux system.",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/out/build/${presetName}",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "VOLE_PSI_THIRDPARTY_CLONE_DIR": "/home/peter/volepsi/out/",
-        "VOLEPSI_THIRDPARTY_DIR": "/home/peter/volepsi/out/install/${presetName}",
-        "VOLE_PSI_ENABLE_ASAN": true,
-        "FETCH_AUTO": "ON",
-        "CMAKE_INSTALL_PREFIX": "/home/peter/volepsi/out/install/${presetName}"
-
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
@@ -56,11 +35,11 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "FETCH_AUTO": "OFF",
+        "FETCH_AUTO": true,
         "FETCH_SPARSEHASH": true,
         "VOLE_PSI_ENABLE_ASAN": true,
         "COPROTO_ENABLE_BOOST": true,
-        "CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
+        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       },
       "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
@@ -77,12 +56,13 @@
       },
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "FETCH_AUTO": "OFF",
+        "FETCH_AUTO": true,
         "VOLE_PSI_ENABLE_BOOST": true,
         "VOLE_PSI_ENABLE_BITPOLYMUL": false,
+        "FETCH_LIBOTE": true,
         "FETCH_LIBDIVIDE": true,
         "FETCH_SPARSEHASH": true,
-        "CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
+        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       },
       "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }

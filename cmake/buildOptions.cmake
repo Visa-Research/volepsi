@@ -46,18 +46,19 @@ EVAL(FETCH_LIBDIVIDE_AUTO
 	((NOT DEFINED FETCH_LIBDIVIDE) AND (FETCH_AUTO)))
 
 
-message(STATUS "vole-psi options\n=======================================================")
-
-message(STATUS "Option: FETCH_AUTO        = ${FETCH_AUTO}")
-message(STATUS "Option: FETCH_SPARSEHASH  = ${FETCH_SPARSEHASH}")
-message(STATUS "Option: FETCH_LIBOTE      = ${FETCH_LIBOTE}")
-message(STATUS "Option: FETCH_LIBDIVIDE   = ${FETCH_LIBDIVIDE}")
-message(STATUS "Option: VERBOSE_FETCH     = ${VERBOSE_FETCH}")
-
-
 if(NOT DEFINED VOLE_PSI_STD_VER)
     set(VOLE_PSI_STD_VER 17)
 endif()
+
+if(APPLE)
+    set(VOLE_PSI_ENABLE_SODIUM_DEFAULT OFF)
+    set(VOLE_PSI_ENABLE_RELIC_DEFAULT ON)
+else()
+    set(VOLE_PSI_ENABLE_SODIUM_DEFAULT ON)
+    set(VOLE_PSI_ENABLE_RELIC_DEFAULT OFF)
+endif()
+
+
 
 option(VOLE_PSI_ENABLE_SSE    "build the library with SSE intrisics" ON)
 option(VOLE_PSI_ENABLE_GMW    "compile the library with GMW" ON)
@@ -65,7 +66,10 @@ option(VOLE_PSI_ENABLE_CPSI   "compile the library with circuit PSI" ON)
 option(VOLE_PSI_ENABLE_OPPRF  "compile the library with OPPRF" ON)
 option(VOLE_PSI_ENABLE_BOOST   "build coproto with boost support" OFF)
 option(VOLE_PSI_ENABLE_OPENSSL   "build coproto with boost openssl support" OFF)
-option(VOLE_PSI_PIC           "build with PIC" OFF)
+option(VOLE_PSI_PIC               "build with PIC" OFF)
+option(VOLE_PSI_ENABLE_SODIUM    "Use the sodium crypto library." ${VOLE_PSI_ENABLE_SODIUM_DEFAULT})
+option(VOLE_PSI_ENABLE_RELIC     "Use the relic crypto library." ${VOLE_PSI_ENABLE_RELIC_DEFAULT})
+option(VOLE_PSI_SODIUM_MONTGOMERY "request libOTe to use the modified sodium library (non-standard sodium)." ON)
 if(APPLE)
     option(VOLE_PSI_ENABLE_BITPOLYMUL   "build libOTe with quasiCyclic support" OFF)
 else()
@@ -82,6 +86,16 @@ endif()
 
 
 
+message(STATUS "vole-psi options\n=======================================================")
+
+message(STATUS "Option: VOLE_PSI_NO_SYSTEM_PATH    = ${VOLE_PSI_NO_SYSTEM_PATH}")
+message(STATUS "Option: CMAKE_BUILD_TYPE           = ${CMAKE_BUILD_TYPE}\n")
+message(STATUS "Option: FETCH_AUTO                 = ${FETCH_AUTO}")
+message(STATUS "Option: FETCH_SPARSEHASH           = ${FETCH_SPARSEHASH}")
+message(STATUS "Option: FETCH_LIBOTE               = ${FETCH_LIBOTE}")
+message(STATUS "Option: FETCH_LIBDIVIDE            = ${FETCH_LIBDIVIDE}")
+
+
 message("\n")
 message(STATUS "Option: VOLE_PSI_ENABLE_SSE        = ${VOLE_PSI_ENABLE_SSE}")
 message(STATUS "Option: VOLE_PSI_PIC               = ${VOLE_PSI_PIC}")
@@ -94,5 +108,8 @@ message(STATUS "Option: VOLE_PSI_ENABLE_OPPRF      = ${VOLE_PSI_ENABLE_OPPRF}\n"
 message(STATUS "Option: VOLE_PSI_ENABLE_BOOST      = ${VOLE_PSI_ENABLE_BOOST}")
 message(STATUS "Option: VOLE_PSI_ENABLE_OPENSSL    = ${VOLE_PSI_ENABLE_OPENSSL}")
 message(STATUS "Option: VOLE_PSI_ENABLE_BITPOLYMUL = ${VOLE_PSI_ENABLE_BITPOLYMUL}")
+message(STATUS "Option: VOLE_PSI_ENABLE_SODIUM     = ${VOLE_PSI_ENABLE_SODIUM}")
+message(STATUS "Option: VOLE_PSI_SODIUM_MONTGOMERY = ${VOLE_PSI_SODIUM_MONTGOMERY}")
+message(STATUS "Option: VOLE_PSI_ENABLE_RELIC      = ${VOLE_PSI_ENABLE_RELIC}")
 
 

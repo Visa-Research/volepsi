@@ -395,9 +395,7 @@ namespace volePSI
                     if (sortOutput)
                         counting_sort(recver.mIntersection.begin(), recver.mIntersection.end(), set.size());
 
-                    //writeOutput(outPath, ft, recver.mIntersection, indexOnly, path);
-
-
+                    writeOutput(outPath, ft, recver.mIntersection, indexOnly, path);
 
                     auto outEnd = timer.setTimePoint("");
                     if (!quiet)
