@@ -11,12 +11,11 @@ void networkSocketExampleRun(const oc::CLP& cmd)
         bool client = !cmd.getOr("server", recver);
         auto ip = cmd.getOr<std::string>("ip", "localhost:1212");
 
-        auto ns = cmd.getOr("senderSize", 100);
-        auto nr = cmd.getOr("receiverSize", 100);
-        auto verbose = cmd.isSet("v");
+        auto ns = cmd.getOr("senderSize", 100ull);
+        auto nr = cmd.getOr("receiverSize", 100ull);
 
         // The statistical security parameter.
-        auto ssp = cmd.getOr("ssp", 40);
+        auto ssp = cmd.getOr("ssp", 40ull);
 
         // Malicious Security.
         auto mal = cmd.isSet("malicious");
@@ -113,8 +112,8 @@ void networkSocketExampleRun(const oc::CLP& cmd)
         else
         {
             // Use dummy set {0,1,...}
-            set.resize(ns);
-            for (oc::u64 i = 0; i < ns; ++i)
+            set.resize(nr);
+            for (oc::u64 i = 0; i < nr; ++i)
                 set[i] = oc::block(0, i);
 
             // Configure.

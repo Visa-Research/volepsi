@@ -113,10 +113,10 @@ void messagePassingExampleRun(oc::CLP& cmd)
     auto receiver = cmd.get<int>("r");
 
     // The sender set size.
-    auto ns = cmd.getOr("senderSize", 100);
+    auto ns = cmd.getOr("senderSize", 100ull);
 
     // The receiver set size.
-    auto nr = cmd.getOr("receiverSize", 100);
+    auto nr = cmd.getOr("receiverSize", 100ull);
     auto verbose = cmd.isSet("v");
 
     // The statistical security parameter.
@@ -168,7 +168,7 @@ void messagePassingExampleRun(oc::CLP& cmd)
     {
         // in this example we use the set {0,1,...}.
         set.resize(ns);
-        for (oc::u64 i = 0; i < ns; ++i)
+        for (oc::u64 i = 0; i < nr; ++i)
             set[i] = oc::block(0, i);
 
         volePSI::RsPsiReceiver recevier;

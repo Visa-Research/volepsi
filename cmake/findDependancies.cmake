@@ -55,7 +55,7 @@ macro(FIND_LIBOTE)
     if(FETCH_LIBOTE)
         list(APPEND ARGS NO_DEFAULT_PATH PATHS ${VOLEPSI_THIRDPARTY_DIR})
     elseif(${VOLE_PSI_NO_SYSTEM_PATH})
-        list(APPEND ARGS NO_CMAKE_SYSTEM_PATH)
+        list(APPEND ARGS NO_DEFAULT_PATH PATHS ${CMAKE_PREFIX_PATH})
     endif()
     
     set(libOTe_options silentot silent_vole circuits)

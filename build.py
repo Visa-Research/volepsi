@@ -102,13 +102,13 @@ def Build(projectName, argv, install, par, sudo, noConfig):
 def help():
 
     print(" --install \n\tInstructs the script to install whatever is currently being built to the default location.")
-    print(" --install=prefix  \n\tinstall to the provided predix.")
+    print(" --install=prefix  \n\tinstall to the provided prefix.")
     print(" --sudo  \n\twhen installing, use sudo. May require password.")
     print(" --par=n  \n\twhen building do use parallel  builds with n threads. default = num cores.")
-    print(" --noauto  \n\twhen building do not automaticly fetch dependancies.")
+    print(" --noauto  \n\twhen building do not automatically fetch dependencies.")
     print(" --par=n  \n\twhen building do use parallel  builds with n threads. default = num cores.")
     print(" --debug  \n\tdebug build.")
-    print("any additioanl arguments are forwared to cmake.\n")
+    print("any additional arguments are forward to cmake.\n")
 
     print("-build the library")
     print("     python build.py")

@@ -53,7 +53,10 @@ int main(int argc, char** argv)
             << "   -r <value>: value should be in { 0, 1 } where 0 means PSI sender.\n"
 
             << "   -out <value>: The output file path. Will be written in the same format as the input. (Default = in || \".out\")\n"
+            << "   -quiet: print less info.\n"
+            << "   -v: print more info.\n"
             << "   -indexSet: output the index set of the intersection instead of the set element itself\n"
+            << "   -noSort: do not require the output to be in the same order and the input (slightly faster)."
             << "   -malicious: run the protocol with malicious security\n"
             << "   -useSilver: run the protocol with the Silver Vole encoder (experimental)\n"
             << "   -ssp: Statistical Security parameter, default = 40.\n\n"

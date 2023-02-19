@@ -193,7 +193,7 @@ namespace volePSI
                 if (inFile.is_open() == false)
                     throw std::runtime_error("failed to open file: " + inPath);
 
-                auto size = filesize(inFile);
+                u64 size = filesize(inFile);
                 std::vector<char> fData(size);
                 inFile.read(fData.data(), size);
 
@@ -230,6 +230,7 @@ namespace volePSI
     void doFilePSI(const oc::CLP& cmd)
     {
         try {
+            
             auto path = cmd.get<std::string>("in");
             auto outPath = cmd.getOr<std::string>("out", path + ".out");
             bool debug = cmd.isSet("debug");
@@ -239,9 +240,18 @@ namespace volePSI
             bool tls = cmd.isSet("tls");
             bool quiet = cmd.isSet("quiet");
             bool verbose = cmd.isSet("v");
-            u64 trials = cmd.getOr("trials", 1);
 
-            block seed = cmd.hasValue("seed") ? block(cmd.get<u64>("seed"), 0) : oc::sysRandomSeed();
+            block seed;
+            if (cmd.hasValue("seed"))
+            {
+                auto seedStr = cmd.get<std::string>("seed");
+                oc::RandomOracle ro(sizeof(block));
+                ro.Update(seedStr.data(), seedStr.size());
+                ro.Final(seed);
+            }
+            else
+                seed = oc::sysRandomSeed();
+
             // The vole type.
 #ifdef ENABLE_BITPOLYMUL
             auto mType = cmd.isSet("useSilver") ? oc::MultType::slv5 : oc::MultType::QuasiCyclic;
@@ -353,62 +363,56 @@ namespace volePSI
                 throw std::runtime_error("Other party's set size does not match.");
 
 
-            for (u64 i = 0; i < trials; ++i)
+
+            auto valEnd = timer.setTimePoint("");
+            if (!quiet)
+                std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(valEnd - connEnd).count()
+                << "ms\nrunning PSI... " << std::flush;
+
+            if (r == Role::Sender)
             {
+                RsPsiSender sender;
 
-                auto valEnd = timer.setTimePoint("");
+                sender.mDebug = debug;
+                sender.setMultType(mType);
+                sender.init(set.size(), theirSize, statSetParam, seed, mal, 1);
+                macoro::sync_wait(sender.run(set, chl));
+                macoro::sync_wait(chl.flush());
+
+                auto psiEnd = timer.setTimePoint("");
                 if (!quiet)
-                    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(valEnd - connEnd).count()
-                    << "ms\nrunning PSI... " << std::flush;
+                    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(psiEnd - valEnd).count()
+                    << "ms\nDone" << std::endl;
+            }
+            else
+            {
+                RsPsiReceiver recver;
 
-                if (r == Role::Sender)
-                {
-                    RsPsiSender sender;
-
-                    sender.mDebug = debug;
-                    sender.setMultType(mType);
-                    sender.init(set.size(), theirSize, statSetParam, seed, mal, 1);
-                    macoro::sync_wait(sender.run(set, chl));
-                    macoro::sync_wait(chl.flush());
-
-                    auto psiEnd = timer.setTimePoint("");
-                    if (!quiet)
-                        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(psiEnd - valEnd).count()
-                        << "ms\nDone" << std::endl;
-                }
-                else
-                {
-                    RsPsiReceiver recver;
-
-                    recver.mDebug = debug;
-                    recver.setMultType(mType);
-                    recver.init(theirSize, set.size(), statSetParam, seed, mal, 1);
-                    macoro::sync_wait(recver.run(set, chl));
-                    macoro::sync_wait(chl.flush());
+                recver.mDebug = debug;
+                recver.setMultType(mType);
+                recver.init(theirSize, set.size(), statSetParam, seed, mal, 1);
+                macoro::sync_wait(recver.run(set, chl));
+                macoro::sync_wait(chl.flush());
 
 
-                    auto psiEnd = timer.setTimePoint("");
-                    if (!quiet)
-                        std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(psiEnd - valEnd).count()
-                        << "ms\nWriting output to " << outPath << std::flush;
+                auto psiEnd = timer.setTimePoint("");
+                if (!quiet)
+                    std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(psiEnd - valEnd).count()
+                    << "ms\nWriting output to " << outPath << std::flush;
 
-                    if (sortOutput)
-                        counting_sort(recver.mIntersection.begin(), recver.mIntersection.end(), set.size());
+                if (sortOutput)
+                    counting_sort(recver.mIntersection.begin(), recver.mIntersection.end(), set.size());
 
-                    writeOutput(outPath, ft, recver.mIntersection, indexOnly, path);
+                writeOutput(outPath, ft, recver.mIntersection, indexOnly, path);
 
-                    auto outEnd = timer.setTimePoint("");
-                    if (!quiet)
-                        std::cout << " " << std::chrono::duration_cast<std::chrono::milliseconds>(outEnd - psiEnd).count()
-                        << "ms\n" << std::flush;
+                auto outEnd = timer.setTimePoint("");
+                if (!quiet)
+                    std::cout << " " << std::chrono::duration_cast<std::chrono::milliseconds>(outEnd - psiEnd).count()
+                    << "ms\n" << std::flush;
 
 
-                    if (verbose)
-                        std::cout << "intesection_size = " << recver.mIntersection.size() << " seed " << seed << std::endl;
-                }
-
-                seed = block(0, 1) + seed;
-
+                if (verbose)
+                    std::cout << "intesection_size = " << recver.mIntersection.size() << std::endl;
             }
 
         }
