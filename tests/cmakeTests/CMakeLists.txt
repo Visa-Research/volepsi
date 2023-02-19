@@ -9,7 +9,17 @@ find_package(volePSI REQUIRED HINTS ${VOLEPSI_HINT})
 
 add_executable(main "main.cpp")
 
-target_compile_options(main PRIVATE
-    "-std=c++${VOLE_PSI_STD_VER}"
-)    
+if(MSVC)
+    set_target_properties(volePSI
+        PROPERTIES
+            CXX_STANDARD ${VOLE_PSI_STD_VER}
+            CXX_STANDARD_REQUIRED YES
+            CXX_EXTENSIONS NO
+    )
+else()
+	target_compile_options(main PRIVATE
+		"-std=c++${VOLE_PSI_STD_VER}"
+	)    
+endif()
+
 target_link_libraries(main visa::volePSI)
