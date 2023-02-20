@@ -49,7 +49,7 @@ elseif(MSVC)
     )
 
     if(VOLE_PSI_ENABLE_ASAN)
-        message("\n\nasan\n\n")
+        message(WARNING "volepsi has ASAN enabled")
         target_compile_options(volePSI PUBLIC "/fsanitize=address")
         target_link_options(volePSI PUBLIC "/fsanitize=address")
 
@@ -60,7 +60,7 @@ else()
     )    
 
     if(VOLE_PSI_ENABLE_ASAN)
-        message("\n\nasan\n\n")
+        message(WARNING "volepsi has ASAN enabled")
         target_compile_options(volePSI PUBLIC "-fsanitize=address")# "-ftime-report")
         target_link_options(volePSI PUBLIC "-fsanitize=address")
     endif()
@@ -69,7 +69,14 @@ endif()
 if(MSVC)
     target_compile_definitions(volePSI PUBLIC "_ENABLE_EXTENDED_ALIGNED_STORAGE")
 else()
-    target_compile_options(volePSI PUBLIC -mavx)
+
+    if(VOLE_PSI_ENABLE_SSE)
+        target_compile_options(volePSI PUBLIC -mavx)
+    endif()
+
+    if(VOLE_PSI_ENABLE_PIC)
+        target_compile_options(volePSI PUBLIC "-fPIC")
+    endif()
 endif()
 
 #target_compile_features(volePSI PUBLIC cxx_std_17)

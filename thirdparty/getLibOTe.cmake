@@ -2,7 +2,7 @@
 set(USER_NAME           )      
 set(TOKEN               )      
 set(GIT_REPOSITORY      "https://github.com/osu-crypto/libOTe.git")
-set(GIT_TAG             "9c4db3054271752dc32c8709e9580920b8877a82" )
+set(GIT_TAG             "169c6fb41c16990e62694518680c02f353e9cf51" )
 
 set(DEP_NAME            libOTe)          
 set(CLONE_DIR "${VOLE_PSI_THIRDPARTY_CLONE_DIR}/${DEP_NAME}")
@@ -39,7 +39,8 @@ if(NOT ${DEP_NAME}_FOUND OR LIBOTE_DEV)
                        -DENABLE_BOOST=${VOLE_PSI_ENABLE_BOOST}
                        -DENABLE_OPENSSL=${VOLE_PSI_ENABLE_OPENSSL}
                        -DLIBOTE_STD_VER=${VOLE_PSI_STD_VER}
-                       -DOC_PIC=${VOLE_PSI_PIC}
+                       -DENABLE_PIC=${VOLE_PSI_ENABLE_PIC}
+                       -DENABLE_ASAN=${VOLE_PSI_ENABLE_ASAN}
                        -DOC_THIRDPARTY_CLONE_DIR=${VOLE_PSI_THIRDPARTY_CLONE_DIR}
                        -DOC_THIRDPARTY_INSTALL_PREFIX=${VOLEPSI_THIRDPARTY_DIR}
                        -DENABLE_SODIUM=${VOLE_PSI_ENABLE_SODIUM}

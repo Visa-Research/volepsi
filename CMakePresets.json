@@ -37,7 +37,7 @@
         "CMAKE_BUILD_TYPE": "Debug",
         "FETCH_AUTO": true,
         "FETCH_SPARSEHASH": true,
-        "VOLE_PSI_ENABLE_ASAN": true,
+        "VOLE_PSI_ENABLE_ASAN": false,
         "COPROTO_ENABLE_BOOST": true,
         //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
