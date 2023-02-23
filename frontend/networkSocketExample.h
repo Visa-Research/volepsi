@@ -20,11 +20,11 @@ void networkSocketExampleRun(const oc::CLP& cmd)
         // Malicious Security.
         auto mal = cmd.isSet("malicious");
 
-        // The vole type.
+        // The vole type, default to expand accumulate.
+        auto type = oc::DefaultMultType;
+        type = cmd.isSet("useSilver") ? oc::MultType::slv5 : type;
 #ifdef ENABLE_BITPOLYMUL
-        auto useSilver = cmd.isSet("useSilver");
-#else
-        auto useSilver = true;
+        type = cmd.isSet("useQC") ? oc::MultType::QuasiCyclic : type;
 #endif
 
         // use fewer rounds of communication but more computation.
@@ -101,7 +101,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
 
             // configure
             volePSI::RsPsiSender sender;
-            sender.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
+            sender.setMultType(type);
             sender.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, useReducedRounds);
 
             std::cout << "sender start\n";
@@ -122,7 +122,7 @@ void networkSocketExampleRun(const oc::CLP& cmd)
 
             // Configure.
             volePSI::RsPsiReceiver recevier;
-            recevier.setMultType(useSilver ? oc::MultType::slv5 : oc::MultType::QuasiCyclic);
+            recevier.setMultType(type);
             recevier.init(ns, nr, ssp, oc::sysRandomSeed(), mal, 1, useReducedRounds);
 
             std::cout << "recver start\n";

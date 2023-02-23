@@ -125,11 +125,11 @@ void messagePassingExampleRun(oc::CLP& cmd)
     // Malicious Security.
     auto mal = cmd.isSet("malicious");
 
-    // The vole type.
+    // The vole type, default to expand accumulate.
+    auto type = oc::DefaultMultType;
+    type = cmd.isSet("useSilver") ? oc::MultType::slv5 : type;
 #ifdef ENABLE_BITPOLYMUL
-    auto type = cmd.isSet("useSilver") ? oc::MultType::slv5 : oc::MultType::QuasiCyclic;
-#else
-    auto type = oc::MultType::slv5;
+    type = cmd.isSet("useQC") ? oc::MultType::QuasiCyclic : type;
 #endif
 
     // use fewer rounds of communication but more computation.
@@ -209,11 +209,11 @@ void messagePassingExampleBoth(oc::CLP& cmd)
     // Malicious Security.
     auto mal = cmd.isSet("malicious");
 
-    // The vole type.
+    // The vole type, default to expand accumulate.
+    auto type = oc::DefaultMultType;
+    type = cmd.isSet("useSilver") ? oc::MultType::slv5 : type;
 #ifdef ENABLE_BITPOLYMUL
-    auto type = cmd.isSet("useSilver") ? oc::MultType::slv5 : oc::MultType::QuasiCyclic;
-#else
-    auto type = oc::MultType::slv5;
+    type = cmd.isSet("useQC") ? oc::MultType::QuasiCyclic : type;
 #endif
 
     // use fewer rounds of communication but more computation.

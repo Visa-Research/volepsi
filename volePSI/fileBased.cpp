@@ -252,11 +252,11 @@ namespace volePSI
             else
                 seed = oc::sysRandomSeed();
 
-            // The vole type.
+            // The vole type, default to expand accumulate.
+            auto type = oc::DefaultMultType;
+            type = cmd.isSet("useSilver") ? oc::MultType::slv5 : type;
 #ifdef ENABLE_BITPOLYMUL
-            auto mType = cmd.isSet("useSilver") ? oc::MultType::slv5 : oc::MultType::QuasiCyclic;
-#else
-            auto mType = oc::MultType::slv5;
+            type = cmd.isSet("useQC") ? oc::MultType::QuasiCyclic : type;
 #endif
 
             FileType ft = FileType::Unspecified;
@@ -374,7 +374,7 @@ namespace volePSI
                 RsPsiSender sender;
 
                 sender.mDebug = debug;
-                sender.setMultType(mType);
+                sender.setMultType(type);
                 sender.init(set.size(), theirSize, statSetParam, seed, mal, 1);
                 macoro::sync_wait(sender.run(set, chl));
                 macoro::sync_wait(chl.flush());
@@ -389,7 +389,7 @@ namespace volePSI
                 RsPsiReceiver recver;
 
                 recver.mDebug = debug;
-                recver.setMultType(mType);
+                recver.setMultType(type);
                 recver.init(theirSize, set.size(), statSetParam, seed, mal, 1);
                 macoro::sync_wait(recver.run(set, chl));
                 macoro::sync_wait(chl.flush());

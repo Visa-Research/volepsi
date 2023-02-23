@@ -351,7 +351,13 @@ void perfPSI(oc::CLP& cmd)
 	auto nt = cmd.getOr("nt", 1);
 	bool fakeBase = cmd.isSet("fakeBase");
 	bool noCompress = cmd.isSet("nc");
-	bool useSilver = cmd.isSet("useSilver");
+
+	// The vole type, default to expand accumulate.
+	auto type = oc::DefaultMultType;
+	type = cmd.isSet("useSilver") ? oc::MultType::slv5 : type;
+#ifdef ENABLE_BITPOLYMUL
+	type = cmd.isSet("useQC") ? oc::MultType::QuasiCyclic : type;
+#endif
 	//IOService ios;
 
 	//auto chl0 = Session(ios, "localhost:1212", SessionMode::Server).addChannel();
@@ -378,13 +384,8 @@ void perfPSI(oc::CLP& cmd)
 	recv.init(n, n, 40, ZeroBlock, mal, nt);
 	send.init(n, n, 40, ZeroBlock, mal, nt);
 
-#ifdef ENABLE_BITPOLYMUL
-	if (useSilver)
-	{
-		recv.setMultType(oc::MultType::slv5);
-		send.setMultType(oc::MultType::slv5);
-	}
-#endif
+	recv.setMultType(type);
+	send.setMultType(type);
 
 	if (noCompress)
 	{

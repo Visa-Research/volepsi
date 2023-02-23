@@ -15,8 +15,6 @@ void RsOprf_eval_test(const CLP&)
 {
     RsOprfSender sender;
     RsOprfReceiver recver;
-    sender.setMultType(oc::MultType::slv5);
-    recver.setMultType(oc::MultType::slv5);
 
     auto sockets = LocalAsyncSocket::makePair();
     u64 n = 4000;
