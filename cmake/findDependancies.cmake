@@ -117,53 +117,5 @@ endif()
 
 FIND_LIBOTE(REQUIRED)
 
-
-
-#######################################
-# libDivide
-
-macro(FIND_LIBDIVIDE)
-    set(ARGS ${ARGN})
-
-    #explicitly asked to fetch libdivide
-    if(FETCH_LIBDIVIDE)
-        list(APPEND ARGS NO_DEFAULT_PATH PATHS ${VOLEPSI_THIRDPARTY_DIR})
-    elseif(${VOLE_PSI_NO_SYSTEM_PATH})
-        list(APPEND ARGS NO_CMAKE_SYSTEM_PATH)
-    endif()
-
-
-    unset(LIBDIVIDE_INCLUDE_DIRS CACHE)
-    find_path(LIBDIVIDE_INCLUDE_DIRS "libdivide.h" PATH_SUFFIXES "include" ${ARGS})
-    if(EXISTS "${LIBDIVIDE_INCLUDE_DIRS}/libdivide.h")
-        set(LIBDIVIDE_FOUND ON)
-    else()
-        set(LIBDIVIDE_FOUND OFF)
-    endif()
-
-endmacro()
-
-if(FETCH_LIBDIVIDE_AUTO)
-    FIND_LIBDIVIDE(QUIET)
-    include(${CMAKE_CURRENT_LIST_DIR}/../thirdparty/getLibDivide.cmake)
-endif()
-
-FIND_LIBDIVIDE(REQUIRED)
-
-if(LIBDIVIDE_FOUND)
-    if(NOT TARGET libdivide)
-        add_library(libdivide INTERFACE IMPORTED)
-    
-        target_include_directories(libdivide INTERFACE 
-                        $<BUILD_INTERFACE:${LIBDIVIDE_INCLUDE_DIRS}>
-                        $<INSTALL_INTERFACE:>)
-
-        message(STATUS "LIBDIVIDE_INCLUDE_DIRS:  ${LIBDIVIDE_INCLUDE_DIRS}")
-    endif()
-else()
-    message(FATAL_ERROR "Failed to find libDivide.")
-
-endif()
-
 # resort the previous prefix path
 set(CMAKE_PREFIX_PATH ${PUSHED_CMAKE_PREFIX_PATH})

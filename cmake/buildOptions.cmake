@@ -99,7 +99,6 @@ message(STATUS "Option: CMAKE_BUILD_TYPE           = ${CMAKE_BUILD_TYPE}\n")
 message(STATUS "Option: FETCH_AUTO                 = ${FETCH_AUTO}")
 message(STATUS "Option: FETCH_SPARSEHASH           = ${FETCH_SPARSEHASH}")
 message(STATUS "Option: FETCH_LIBOTE               = ${FETCH_LIBOTE}")
-message(STATUS "Option: FETCH_LIBDIVIDE            = ${FETCH_LIBDIVIDE}")
 
 
 message("\n")
