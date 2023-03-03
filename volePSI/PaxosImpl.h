@@ -1436,7 +1436,7 @@ namespace volePSI
 
 		// masks that will be used to select the 
 		// bits of the dense columns.
-		std::vector<u64> denseMasks(g);
+		// std::vector<u64> denseMasks(g);
 
 		// the dense part of the paxos.
 		auto p2 = P.subspan(mSparseSize);
@@ -1483,10 +1483,10 @@ namespace volePSI
 				}
 			}
 
-			for (u64 i = 0; i < g; ++i)
-			{
-				denseMasks[i] = 1ull << gapCols[i];
-			}
+			// for (u64 i = 0; i < g; ++i)
+			// {
+			// 	denseMasks[i] = 1ull << gapCols[i];
+			// }
 
 		}
 		else if (prng)
@@ -1524,25 +1524,27 @@ namespace volePSI
 				h.add(y, P[cc]);
 			}
 
-			assert(mDenseSize <= 64);
+			// assert(mDenseSize <= 64);
 			// TODO, merge these two if statements
 			if (prng)
 			{
-				auto d = mDense[i].template get<u64>(0);
+				// auto d = mDense[i].template get<u64>(0);
+				auto d = (u8*)(&mDense[i]);
 				for (u64 j = 0; j < mDenseSize; ++j)
 				{
-					if (d & 1) {
+					// if (d & 1) {
+					if (*BitIterator(d, j)) {						
 						// y += p2[j]
 						h.add(y, p2[j]);
 					}
-					d >>= 1;
+					// d >>= 1;
 				}
 			}
 			else
 			{
 				for (u64 j = 0; j < g; ++j) {
-					assert(mDenseSize <= 64);
-					if (mDense[i].template get<u64>(0) & denseMasks[j])
+					// assert(mDenseSize <= 64);
+					if (*BitIterator((u8*)(&mDense[i]), gapCols[j]))
 					{
 						h.add(y, p2[gapCols[j]]);
 					}
@@ -1953,7 +1955,7 @@ namespace volePSI
 		else
 		{
 
-			std::array<u64, 8> d2;
+			std::array<u8*, 8> d2;
 			std::array<u8, 8> b;
 
 			for (u64 k = 0; k < 4; ++k)
@@ -1966,29 +1968,38 @@ namespace volePSI
 				//memset(&zeroAndAllOne[0], 0, sizeof(ValueType));
 				//memset(&zeroAndAllOne[1], -1, sizeof(ValueType));
 
-				assert(mDenseSize <= 64);
+				// assert(mDenseSize <= 64);
 				for (u64 i = 0; i < 8; ++i)
-					d2[i] = dense[i].get<u64>(0);
+					d2[i] = (u8*)(&dense[i]);
 				//memcpy(d2.data(), dense, sizeof(u64) * 8);
 				for (u64 i = 0; i < mDenseSize; ++i)
 				{
-					b[0] = d2[0] & 1;
-					b[1] = d2[1] & 1;
-					b[2] = d2[2] & 1;
-					b[3] = d2[3] & 1;
-					b[4] = d2[4] & 1;
-					b[5] = d2[5] & 1;
-					b[6] = d2[6] & 1;
-					b[7] = d2[7] & 1;
+					b[0] = *BitIterator(d2[0], i);
+					b[1] = *BitIterator(d2[1], i);
+					b[2] = *BitIterator(d2[2], i);
+					b[3] = *BitIterator(d2[3], i);
+					b[4] = *BitIterator(d2[4], i);
+					b[5] = *BitIterator(d2[5], i);
+					b[6] = *BitIterator(d2[6], i);
+					b[7] = *BitIterator(d2[7], i);
 
-					d2[0] = d2[0] >> 1;
-					d2[1] = d2[1] >> 1;
-					d2[2] = d2[2] >> 1;
-					d2[3] = d2[3] >> 1;
-					d2[4] = d2[4] >> 1;
-					d2[5] = d2[5] >> 1;
-					d2[6] = d2[6] >> 1;
-					d2[7] = d2[7] >> 1;
+					// b[0] = d2[0] & 1;
+					// b[1] = d2[1] & 1;
+					// b[2] = d2[2] & 1;
+					// b[3] = d2[3] & 1;
+					// b[4] = d2[4] & 1;
+					// b[5] = d2[5] & 1;
+					// b[6] = d2[6] & 1;
+					// b[7] = d2[7] & 1;
+
+					// d2[0] = d2[0] >> 1;
+					// d2[1] = d2[1] >> 1;
+					// d2[2] = d2[2] >> 1;
+					// d2[3] = d2[3] >> 1;
+					// d2[4] = d2[4] >> 1;
+					// d2[5] = d2[5] >> 1;
+					// d2[6] = d2[6] >> 1;
+					// d2[7] = d2[7] >> 1;
 
 					//pp[0] = zeroAndAllOne[b[0]];
 					//pp[1] = zeroAndAllOne[b[1]];
@@ -2121,7 +2132,7 @@ namespace volePSI
 		else
 		{
 
-			std::array<u64, 8> d2;
+			std::array<u8*, 8> d2;
 			std::array<u8, 8> b;
 			//std::array<ValueType, 8> pp;
 			//auto& pp = h.getTempArray8();
@@ -2129,29 +2140,38 @@ namespace volePSI
 			//memset(&zeroAndAllOne[0], 0, sizeof(ValueType));
 			//memset(&zeroAndAllOne[1], -1, sizeof(ValueType));
 
-			assert(mDenseSize <= 64);
+			// assert(mDenseSize <= 64);
 			for (u64 i = 0; i < 8; ++i)
-				d2[i] = dense[i].get<u64>(0);
+				d2[i] = (u8*)(&dense[i]);
 			//memcpy(d2.data(), dense, sizeof(u64) * 8);
 			for (u64 i = 0; i < mDenseSize; ++i)
 			{
-				b[0] = d2[0] & 1;
-				b[1] = d2[1] & 1;
-				b[2] = d2[2] & 1;
-				b[3] = d2[3] & 1;
-				b[4] = d2[4] & 1;
-				b[5] = d2[5] & 1;
-				b[6] = d2[6] & 1;
-				b[7] = d2[7] & 1;
+				b[0] = *BitIterator(d2[0], i);
+				b[1] = *BitIterator(d2[1], i);
+				b[2] = *BitIterator(d2[2], i);
+				b[3] = *BitIterator(d2[3], i);
+				b[4] = *BitIterator(d2[4], i);
+				b[5] = *BitIterator(d2[5], i);
+				b[6] = *BitIterator(d2[6], i);
+				b[7] = *BitIterator(d2[7], i);
 
-				d2[0] = d2[0] >> 1;
-				d2[1] = d2[1] >> 1;
-				d2[2] = d2[2] >> 1;
-				d2[3] = d2[3] >> 1;
-				d2[4] = d2[4] >> 1;
-				d2[5] = d2[5] >> 1;
-				d2[6] = d2[6] >> 1;
-				d2[7] = d2[7] >> 1;
+				// b[0] = d2[0] & 1;
+				// b[1] = d2[1] & 1;
+				// b[2] = d2[2] & 1;
+				// b[3] = d2[3] & 1;
+				// b[4] = d2[4] & 1;
+				// b[5] = d2[5] & 1;
+				// b[6] = d2[6] & 1;
+				// b[7] = d2[7] & 1;
+
+				// d2[0] = d2[0] >> 1;
+				// d2[1] = d2[1] >> 1;
+				// d2[2] = d2[2] >> 1;
+				// d2[3] = d2[3] >> 1;
+				// d2[4] = d2[4] >> 1;
+				// d2[5] = d2[5] >> 1;
+				// d2[6] = d2[6] >> 1;
+				// d2[7] = d2[7] >> 1;
 
 				//pp[0] = zeroAndAllOne[b[0]];
 				//pp[1] = zeroAndAllOne[b[1]];
