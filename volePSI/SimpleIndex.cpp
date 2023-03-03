@@ -276,8 +276,8 @@ namespace volePSI
             // Then evalate the surface at out bin,ball coordinate.
             if (numBinsHgh < sizes.size() && numBallsHgh < sizes[numBinsHgh].size())
             {
-                auto a0 = (diffBin)*sizes[numBinsLow][numBallsLow] + (1 - diffBin) * sizes[numBinsLow][numBallsHgh];
-                auto a1 = (diffBin)*sizes[numBinsHgh][numBallsLow] + (1 - diffBin) * sizes[numBinsHgh][numBallsHgh];
+                auto a0 = (diffBin)*sizes[numBinsLow][numBallsLow] + (1 - diffBin) * sizes[numBinsHgh][numBallsLow];
+                auto a1 = (diffBin)*sizes[numBinsLow][numBallsHgh] + (1 - diffBin) * sizes[numBinsHgh][numBallsHgh];
 
                 auto b0 = (diffBall)*a0 + (1 - diffBall) * a1;
 
