@@ -3,6 +3,7 @@
 
 #include "messagePassingExample.h"
 #include "networkSocketExample.h"
+#include "cpsiExample.h"
 #include "volePSI/fileBased.h"
 #include "tests/Paxos_Tests.h"
 
@@ -21,6 +22,10 @@ int main(int argc, char** argv)
     else if (cmd.isSet("messagePassing"))
     {
         messagePassingExample(cmd);
+    }
+    else if (cmd.isSet("cpsiExample"))
+    {
+        cpsiExample(cmd);
     }
     else if (cmd.isSet("net"))
     {
@@ -78,6 +83,13 @@ int main(int argc, char** argv)
 
 
         std::cout << oc::Color::Green << "Example programs: \n" << oc::Color::Default
+            << "   -cpsiExample: Runs the Circuit-PSI example program. Parameters: \n"
+                << "        -nn <value>: the log2 size of the sets.\n"
+                << "        -r <value>: value should be in { 0, 1 } where 0 means sender.\n"
+                << "        -both: instead of using -r from above use -both to run Circuit-PSI in one process.\n"
+                << "        -cols: The number of the payload columns. default = 4.\n"
+                << "        -ssp <value>: statistical security parameter.\n"
+                << "        -v: verbose.\n"
             << "   -messagePassing: Runs the message passing example program. This example shows how to manually pass messages between the PSI parties. Same parameters as File base PSI can be used.\n"
             << "   -net: Run the network socket (TCP/IP or TLS) example program. This example shows how to run the protocol on the coproto network socket. Same parameters as File base PSI can be used.\n\n"
 
