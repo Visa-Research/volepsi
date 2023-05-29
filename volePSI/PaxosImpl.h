@@ -13,7 +13,6 @@
 #include <numeric>
 #include "libOTe/Tools/LDPC/Util.h"
 #include "volePSI/SimpleIndex.h"
-#include <immintrin.h>
 #include <future>
 
 namespace volePSI
