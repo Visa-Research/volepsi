@@ -41,11 +41,6 @@ void cpsiExampleRun(oc::CLP& cmd)
     u64 their_n;
     macoro::sync_wait(chl.send(n));
     macoro::sync_wait(chl.recv(their_n));
-    if (their_n != n)
-        throw std::runtime_error("Other party's set size does not match.");
-    else
-        std::cout << "Set sizes match. Proceeding." << std::endl;
-
     auto t_start = timer.setTimePoint("");
 
     u64 their_columns;
@@ -65,15 +60,20 @@ void cpsiExampleRun(oc::CLP& cmd)
 
     if (role == Role::Sender)
     {
+        u64 n_sender = n;
+        u64 n_receiver = their_n;
+
         RsCpsiSender sender;
         RsCpsiSender::Sharing ss;
-        std::vector<block> sendSet(n);
+        std::vector<block> sendSet(n_sender);
         oc::Matrix<u8> senderValues(sendSet.size(), byteLength);
         std::memcpy(senderValues.data(), sendSet.data(), sendSet.size() * byteLength);
 
         if (verbose)
             std::cout << "sender start\n";
-        sender.init(n, n, byteLength, ssp, seed, 1);
+        std::cout << "sender size" << n_sender << std::endl;
+        std::cout << "receiver size" << n_receiver << std::endl;
+        sender.init(n_sender, n_receiver, byteLength, ssp, seed, 1);
         std::cout << "Init done" << std::endl;
         prng.get<block>(sendSet);
 
@@ -82,13 +82,17 @@ void cpsiExampleRun(oc::CLP& cmd)
     }
     else
     {
+        u64 n_sender = their_n;
+        u64 n_receiver = n;
         RsCpsiReceiver recv;
         RsCpsiReceiver::Sharing rs;
-        std::vector<block> recvSet(n);
+        std::vector<block> recvSet(n_receiver);
 
         if (verbose)
             std::cout << "receiver start\n";
-        recv.init(n, n, byteLength, ssp, seed, 1);
+        std::cout << "sender size: " << n_sender << std::endl;
+        std::cout << "receiver size: " << n_receiver << std::endl;
+        recv.init(n_sender, n_receiver, byteLength, ssp, seed, 1);
         std::cout << "Init done" << std::endl;
         prng.get<block>(recvSet);
 
