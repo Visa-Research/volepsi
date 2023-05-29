@@ -76,6 +76,7 @@ namespace volePSI_Tests
         t.add("Cpsi_Rs_empty_test          ", Cpsi_Rs_empty_test);
         t.add("Cpsi_Rs_partial_test        ", Cpsi_Rs_partial_test);
         t.add("Cpsi_Rs_full_test           ", Cpsi_Rs_full_test);
+        t.add("Cpsi_Rs_full_asym_test      ", Cpsi_Rs_full_asym_test);
         t.add("Cpsi_Rs_full_add32_test     ", Cpsi_Rs_full_add32_test);
 #endif
 

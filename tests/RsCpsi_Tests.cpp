@@ -158,6 +158,28 @@ void Cpsi_Rs_full_test(const CLP& cmd)
         throw RTE_LOC;
 }
 
+void Cpsi_Rs_full_asym_test(const CLP& cmd)
+{
+    u64 ns = cmd.getOr("ns", 2432);
+    u64 nr = cmd.getOr("nr", 212);
+    std::vector<block> recvSet(nr), sendSet(ns);
+    PRNG prng(ZeroBlock);
+    prng.get(recvSet.data(), recvSet.size());
+    prng.SetSeed(ZeroBlock);
+    prng.get(sendSet.data(), sendSet.size());
+
+    std::set<u64> exp;
+    for (u64 i = 0; i < std::min<u64>(ns,nr); ++i)
+        exp.insert(i);
+
+    auto inter = runCpsi(prng, recvSet, sendSet);
+    std::set<u64> act(inter.begin(), inter.end());
+    if (act != exp)
+        throw RTE_LOC;
+}
+
+
+
 
 void Cpsi_Rs_full_add32_test(const CLP& cmd)
 {
