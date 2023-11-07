@@ -286,7 +286,7 @@ namespace volePSI
             a = span<block>{},
             c = span<block>{},
             fu = std::move(macoro::eager_task<void>{}),
-            ii = u64{},
+            ii = u64{0},
             fork = Socket{}
         );
 

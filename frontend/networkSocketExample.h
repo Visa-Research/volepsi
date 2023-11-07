@@ -22,7 +22,9 @@ void networkSocketExampleRun(const oc::CLP& cmd)
 
         // The vole type, default to expand accumulate.
         auto type = oc::DefaultMultType;
+#ifdef ENABLE_INSECURE_SILVER
         type = cmd.isSet("useSilver") ? oc::MultType::slv5 : type;
+    #endif
 #ifdef ENABLE_BITPOLYMUL
         type = cmd.isSet("useQC") ? oc::MultType::QuasiCyclic : type;
 #endif

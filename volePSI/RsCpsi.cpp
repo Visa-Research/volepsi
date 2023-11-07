@@ -186,7 +186,8 @@ namespace volePSI
             {
                 auto j = bin.hashIdx();
                 auto b = bin.idx();
-                j = oc::CuckooIndex<>::minCollidingHashIdx(i, cuckoo.mHashes[b], 3, numBins);
+            
+                //j = oc::CuckooIndex<>::minCollidingHashIdx(i, cuckoo.mHashes[b], 3, numBins);
 
                 auto& hj = hashers[j];
                 Tx[i] = hj.hashBlock(X[b]);

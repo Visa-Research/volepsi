@@ -1,7 +1,6 @@
 {
     "version": 2,
-  "configurePresets": [
-
+    "configurePresets": [
     {
       "name": "linux",
       "displayName": "Linux",
@@ -15,7 +14,6 @@
         "FETCH_LIBDIVIDE": true,
         "VOLE_PSI_ENABLE_ASAN": true,
         "VOLE_PSI_ENABLE_BOOST": true,
-        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       },
       "vendor": {
@@ -39,7 +37,6 @@
         "FETCH_SPARSEHASH": true,
         "VOLE_PSI_ENABLE_ASAN": false,
         "COPROTO_ENABLE_BOOST": true,
-        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       },
       "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
@@ -62,7 +59,6 @@
         "FETCH_LIBOTE": true,
         "FETCH_LIBDIVIDE": true,
         "FETCH_SPARSEHASH": true,
-        //"CMAKE_PREFIX_PATH": "${sourceDir}/../libOTe",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       },
       "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Windows" ] } }
@@ -80,8 +76,7 @@
         "CMAKE_PREFIX_PATH": "/usr/local/opt/openssl/",
         "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}"
       },
-      "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "osx" ] } }
-
+      "vendor": { "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "macOS" ] } }
     }
   ]
 }

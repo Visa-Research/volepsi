@@ -34,17 +34,17 @@ namespace volePSI
 
             // The index of the hash function that this item is 
             // currently using. This in is encoded in the 8th byte.
-            u64 hashIdx() const { return ((u8*)&mVal)[7] & 127; }
+            u64 hashIdx() const { return ((u8*)&mVal)[7]; }
 
             // Return true if this item was set with a collition.
-            bool isCollision() const { return  (((u8*)&mVal)[7] >> 7) > 0; }
+            //bool isCollision() const { return  (((u8*)&mVal)[7] >> 7) > 0; }
 
             // The this item to contain the index idx under the given hash index.
             // The collision value is also encoded.
-            void set(u64 idx, u8 hashIdx, bool collision)
+            void set(u64 idx, u8 hashIdx)
             {
                 mVal = idx;
-                ((u8*)&mVal)[7] = hashIdx | ((collision & 1) << 7);
+                ((u8*)&mVal)[7] = hashIdx;
             }
 #ifdef THREAD_SAFE_SIMPLE_INDEX
             Item(const Item& b) : mVal(b.mVal.load(std::memory_order_relaxed)) {}
