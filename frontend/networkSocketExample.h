@@ -11,8 +11,8 @@ void networkSocketExampleRun(const oc::CLP& cmd)
         bool client = !cmd.getOr("server", recver);
         auto ip = cmd.getOr<std::string>("ip", "localhost:1212");
 
-        auto ns = cmd.getOr("senderSize", 100ull);
-        auto nr = cmd.getOr("receiverSize", 100ull);
+        auto ns = cmd.getOr("senderSize", 10000000ull);
+        auto nr = cmd.getOr("receiverSize", 10000000ull);
 
         // The statistical security parameter.
         auto ssp = cmd.getOr("ssp", 40ull);

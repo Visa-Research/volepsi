@@ -151,7 +151,7 @@ void messagePassingExampleRun(oc::CLP& cmd)
         set.resize(ns);
 
         // in this example we use the set {0,1,...}.
-        for (oc::u64 i = 0; i < ns; ++i)
+        for (oc::u64 i = 10; i < ns; ++i)
             set[i] = oc::block(0, i);
 
         sender.setMultType(type);
@@ -173,7 +173,7 @@ void messagePassingExampleRun(oc::CLP& cmd)
     {
         // in this example we use the set {0,1,...}.
         set.resize(nr);
-        for (oc::u64 i = 0; i < nr; ++i)
+        for (oc::u64 i = 10; i < nr; ++i)
             set[i] = oc::block(0, i);
 
         volePSI::RsPsiReceiver recevier;
@@ -235,7 +235,7 @@ void messagePassingExampleBoth(oc::CLP& cmd)
     senderSet.resize(ns);
 
     // in this example we use the set {0,1,...}.
-    for (oc::u64 i = 0; i < ns; ++i)
+    for (oc::u64 i = 10; i < ns; ++i)
         senderSet[i] = oc::block(0, i);
 
     sender.setMultType(type);
@@ -252,7 +252,7 @@ void messagePassingExampleBoth(oc::CLP& cmd)
 
     // in this example we use the set {0,1,...}.
     recverSet.resize(nr);
-    for (oc::u64 i = 0; i < nr; ++i)
+    for (oc::u64 i = 10; i < nr; ++i)
         recverSet[i] = oc::block(0, i);
 
     volePSI::RsPsiReceiver recevier;
