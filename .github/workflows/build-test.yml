@@ -79,7 +79,7 @@ jobs:
   # This workflow contains a single job called "build"
   build-osx:
     # The type of runner that the job will run on
-    runs-on: macos-latest
+    runs-on: macos-14
     timeout-minutes: 20
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -94,7 +94,7 @@ jobs:
 
       - name: build 
         run: |
-          python3 build.py -DVERBOSE_FETCH=ON -DVOLE_PSI_ENABLE_SSE=OFF 
+          python3 build.py -DVERBOSE_FETCH=ON -DVOLE_PSI_ENABLE_SSE=OFF  -DVOLE_PSI_ENABLE_SODIUM=ON -DVOLE_PSI_ENABLE_RELIC=OFF
                         
       - name: unit test
         run: |
@@ -143,7 +143,7 @@ jobs:
 
   build-windows:
     # The type of runner that the job will run on
-    runs-on: windows-2019
+    runs-on: windows-2022
     timeout-minutes: 20
   
     # Steps represent a sequence of tasks that will be executed as part of the job
