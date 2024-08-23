@@ -8,6 +8,7 @@
 #include "cryptoTools/Circuit/BetaLibrary.h"
 #include "Common.h"
 #include "coproto/Socket/LocalAsyncSock.h"
+#include <numeric>
 
 using namespace volePSI;
 using coproto::LocalAsyncSocket;

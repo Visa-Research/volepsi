@@ -75,11 +75,10 @@ namespace volePSI
 
         Proto generateBaseOts(u64 partyIdx, oc::PRNG& prng, coproto::Socket& chl)
         {
-            MC_BEGIN(Proto,this, partyIdx, &prng, &chl,
-                rMsg = std::vector<block>{},
-                sMsg = std::vector<std::array<block, 2>>{},
-                b = RequiredBase{}
-            );
+            
+            auto rMsg = std::vector<block>{};
+            auto sMsg = std::vector<std::array<block, 2>>{};
+            auto b = RequiredBase{ };
 
             setTimePoint("TripleGen::generateBaseOts begin");
             b = requiredBaseOts();
@@ -88,12 +87,11 @@ namespace volePSI
             {
                 rMsg.resize(b.mRecvChoiceBits.size());
                 sMsg.resize(b.mNumSend);
-                MC_AWAIT(generateBase(b, partyIdx, prng, chl, rMsg, sMsg, mTimer));
+                co_await (generateBase(b, partyIdx, prng, chl, rMsg, sMsg, mTimer));
                 setBaseOts(rMsg, sMsg);
             }
             setTimePoint("TripleGen::generateBaseOts end");
 
-            MC_END();
         }
 
 

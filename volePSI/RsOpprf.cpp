@@ -34,7 +34,7 @@ namespace volePSI
 				}
 			}
 		}
-		else if(m > sizeof(block))
+		else if (m > sizeof(block))
 		{
 			// long string case
 
@@ -51,26 +51,15 @@ namespace volePSI
 	}
 
 
-	struct DD
-	{
-		~DD()
-		{
-			std::cout << "DD" << std::endl;
-		}
-	};
-
 	Proto RsOpprfSender::send(u64 recverSize, span<const block> X, MatrixView<u8> val, PRNG& prng, u64 numThreads, Socket& chl)
 	{
-		MC_BEGIN(Proto,this, recverSize, X, val, &prng, numThreads, &chl,
-			n = u64{},
-			m = u64{},
-			nm = u64{},
-			hashingSeed = block{},
-			type = PaxosParam::Binary,
-
-			diffPtr = std::unique_ptr<u8[]> {},
-			diffU8 = span<u8> {}
-			);
+		auto n = u64{};
+		auto m = u64{};
+		auto nm = u64{};
+		auto hashingSeed = block{};
+		auto type = PaxosParam::Binary;
+		auto diffPtr = std::unique_ptr<u8[]>{};
+		auto diffU8 = span<u8>{};
 
 		setTimePoint("RsOpprfSender::send begin");
 		n = X.size();
@@ -84,7 +73,7 @@ namespace volePSI
 			throw RTE_LOC;
 
 		hashingSeed = prng.get();
-		MC_AWAIT(chl.send(std::move(hashingSeed)));
+		co_await(chl.send(std::move(hashingSeed)));
 
 		type = m % sizeof(block) ? PaxosParam::Binary : PaxosParam::GF128;
 		mPaxos.init(n, 1 << 14, 3, 40, type, hashingSeed);
@@ -92,7 +81,7 @@ namespace volePSI
 		if (mTimer)
 			mOprfSender.setTimer(*mTimer);
 
-		MC_AWAIT(mOprfSender.send(recverSize, prng, chl, numThreads));
+		co_await(mOprfSender.send(recverSize, prng, chl, numThreads));
 
 		diffPtr.reset(new u8[nm]);
 		diffU8 = span<u8>(diffPtr.get(), nm);
@@ -139,11 +128,10 @@ namespace volePSI
 
 		setTimePoint("RsOpprfSender::send paxos solve");
 
-		MC_AWAIT(chl.send(coproto::copy(mP)));
+		co_await(chl.send(coproto::copy(mP)));
 
 		setTimePoint("RsOpprfSender::send end");
 
-		MC_END();
 	}
 
 	void RsOpprfSender::eval(span<const block> val, MatrixView<u8> output, u64 numThreads)
@@ -178,24 +166,22 @@ namespace volePSI
 
 	}
 
-	
+
 	Proto RsOpprfReceiver::receive(
-		u64 senderSize, 
-		span<const block> values, 
-		MatrixView<u8> outputs, 
-		PRNG& prng, 
-		u64 numThreads, 
+		u64 senderSize,
+		span<const block> values,
+		MatrixView<u8> outputs,
+		PRNG& prng,
+		u64 numThreads,
 		Socket& chl)
 	{
-		MC_BEGIN(Proto,this, senderSize, values, outputs, &prng, numThreads, &chl,
-			n = u64{}, m = u64{},
-			paxos = Baxos{},
-			type = PaxosParam::Binary,
-			temp = std::move(BasicVector<block>{}),
-			oprfOutput = span<block> {},
-			p = Matrix<u8> {}
+		auto n = u64{0}, m = u64{0};
+		auto paxos = Baxos{};
+		auto type = PaxosParam::Binary;
+		auto temp = BasicVector<block>{};
+		auto oprfOutput = span<block>{};
+		auto p = Matrix<u8>{ };
 
-			);
 		setTimePoint("RsOpprfReceiver::receive begin");
 
 		if (values.size() != outputs.rows())
@@ -204,7 +190,7 @@ namespace volePSI
 		m = outputs.cols();
 
 
-	 	MC_AWAIT(chl.recv(paxos.mSeed));
+		co_await chl.recv(paxos.mSeed);
 		type = m % sizeof(block) ? PaxosParam::Binary : PaxosParam::GF128;
 		paxos.init(senderSize, 1 << 14, 3, 40, type, paxos.mSeed);
 
@@ -220,7 +206,7 @@ namespace volePSI
 				ptr -= offset;
 			assert((((u64)ptr) % sizeof(block)) == 0);
 
-			oprfOutput = span<block>((block*)(ptr) - n, n);
+			oprfOutput = span<block>((block*)(ptr)-n, n);
 
 			assert(
 				(void*)(oprfOutput.data() + oprfOutput.size()) <=
@@ -232,11 +218,11 @@ namespace volePSI
 			oprfOutput = temp;
 		}
 
-		MC_AWAIT(mOprfReceiver.receive(values, oprfOutput, prng, chl, numThreads));
+		co_await mOprfReceiver.receive(values, oprfOutput, prng, chl, numThreads);
 
 
 		p.resize(paxos.size(), m, oc::AllocType::Uninitialized);
-		MC_AWAIT(chl.recv(p));
+		co_await chl.recv(p);
 		setTimePoint("RsOpprfReceiver::receive recv");
 
 		if (m == sizeof(block))
@@ -277,6 +263,6 @@ namespace volePSI
 
 		setTimePoint("RsOpprfReceiver::receive end");
 
-		MC_END();
+		co_return;
 	}
 }

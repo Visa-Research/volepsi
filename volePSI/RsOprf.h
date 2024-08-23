@@ -18,7 +18,7 @@ namespace volePSI
     class RsOprfSender : public oc::TimerAdapter
     {
     public:
-        oc::SilentVoleSender mVoleSender;
+        oc::SilentVoleSender<block,block, oc::CoeffCtxGF128> mVoleSender;
         span<block> mB;
         block mD;
         Baxos mPaxos;
@@ -49,7 +49,7 @@ namespace volePSI
 
     public:
         bool mMalicious = false;
-        oc::SilentVoleReceiver mVoleRecver;
+        oc::SilentVoleReceiver<block, block, oc::CoeffCtxGF128> mVoleRecver;
         u64 mBinSize = 1 << 14;
         u64 mSsp = 40;
         bool mDebug = false;
