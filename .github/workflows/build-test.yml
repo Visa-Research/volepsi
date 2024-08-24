@@ -94,7 +94,7 @@ jobs:
 
       - name: build 
         run: |
-          python3 build.py -DVERBOSE_FETCH=ON -DVOLE_PSI_ENABLE_SSE=OFF  -DVOLE_PSI_ENABLE_SODIUM=ON -DVOLE_PSI_ENABLE_RELIC=OFF
+          python3 build.py -DVERBOSE_FETCH=ON -DVOLE_PSI_ENABLE_SSE=OFF 
                         
       - name: unit test
         run: |
