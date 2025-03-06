@@ -56,7 +56,7 @@ int main(int argc, char** argv)
             << "   -quiet: print less info.\n"
             << "   -v: print more info.\n"
             << "   -indexSet: output the index set of the intersection instead of the set element itself\n"
-            << "   -noSort: do not require the output to be in the same order and the input (slightly faster)."
+            << "   -noSort: do not require the output to be in the same order and the input (slightly faster).\n"
             << "   -malicious: run the protocol with malicious security\n"
             << "   -useSilver: run the protocol with the Silver Vole encoder (experimental, default is expand accumulate)\n"
             << "   -useQC: run the protocol with the QuasiCyclic Vole encoder (default is expand accumulate)\n"
